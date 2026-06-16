@@ -1,0 +1,26 @@
+{% extends 'base.html' %}
+
+{% block content %}
+
+<h2>My Profile</h2>
+
+<div clas="card p-3 mb-4">
+    <p><b>Username:</b> {{ user.username }}</p>
+    <p><b>Email:</b> {{ user.email }}</p>
+</div>
+
+<h4>My Orders</h4>
+
+{% for order in orders %}
+
+    <div class="card p-2 mb-2">
+        <p>Order #{{ order.id }}</p>
+        <p>{{ order.created }}</p>
+    </div>
+
+{% empty %}
+    <p>No orders yet.</p>
+
+{% endfor %}
+
+{% endblock %}

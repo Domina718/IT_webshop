@@ -1,0 +1,63 @@
+{% extends 'base.html' %}
+
+{% block content %}
+
+<div class="container">
+
+    <h2 class="mb-3">Order #{{ order.id }}</h2>
+
+    <div class="card mb-4 shadow-sm">
+        <div class="card-body">
+
+            <p><b>Date:</b> {{ order.created }}</p>
+
+            {% if order.paid %}
+                <span class="badge bg-success">Paid</span>
+            {% else %}
+                <span class="badge bg-warning text-dark">Pending</span>
+            {% endif %}
+
+            <hr>
+
+            <p><b>Name:</b> {{ order.first_name }} {{ order.last_name }}</p>
+            <p><b>Email:</b> {{ order.email }}</p>
+            <p><b>Address:</b> {{ order.address}}, {{ order.city }} {{ order.postal_code}}</p>
+
+        </div>
+    </div>
+
+    <div class="card shadow-sm">
+        <div class="card-body">
+
+            <h5 class="mb-3">Products</h5>
+
+            <table class="table align-middle">
+                <thead>
+                    <tr>
+                        <th>Product</th>
+                        <th>Price</th>
+                        <th>Qty</th>
+                        <th>Total</th>
+                    </tr>
+                </thead>
+
+                <tbody>
+                    {% for item in order.items.all %}
+                    <tr>
+                        <td>{{ item.product.name }}</td>
+                        <td>{{ item.price }}</td>
+                        <td>{{ item.quantity }}</td>
+                        <td>{{ item.get_cost }}</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+
+            <hr>
+
+            <h4 class="text-end">Total: {{ order.get_total_cost }} €</h4>
+        </div>
+    </div>
+</div>
+
+{% endblock %}

@@ -1,0 +1,199 @@
+{% extends 'base.html' %}
+{% block content %}
+
+<h2>Products</h2>
+
+<div class="row">
+
+    <form method="get" class="mb-3">
+
+        <div class="row g-2">
+
+            <div class="col-md">
+
+                <input type="text"
+                    name="q"
+                    value="{{ query }}"
+                    class="form-control mb-2"
+                    placeholder="Search products...">
+            </div>
+
+            <div class="col-md">
+                <select name="category" class="form-select mb-2">
+                    <option value="" {% if not category_id %}selected{% endif %}>
+                        All categories
+                    </option>
+
+                    {% for category in categories %}
+                        <option value="{{ category.id}}"
+                            {% if category_id == category.id|stringformat:"s" %}
+                                selected
+                            {% endif %}
+                        >
+                            {{ category.name }}
+                        </option>
+                    {% endfor %}
+                </select>
+            </div>
+
+            <div class="col-md">
+                <input type="number"
+                    name="min"
+                    value="{{ min_price }}"
+                    class="form-control mb-2"
+                    placeholder="Min price">
+            </div>
+
+            <div class="col-md">
+                <input type="number"
+                    name="max"
+                    value="{{ max_price }}"
+                    class="form-control mb-2"
+                    placeholder="Max price">
+            </div>
+
+            <div class="col-md-auto">
+                <button class="btn btn-primary">Filter</button>
+            </div>
+
+        </div>
+        
+    </form>
+
+
+    {% for product in products %}
+
+        <div class="col-md-4 mb-3">
+            <div class="card h-100 shadow-sm"> 
+
+                {% if product.image %}
+                    <img src="{{ product.image.url }}" 
+                        class="card-img-top"
+                        style="height: 220px; object-fit: cover;">
+                {% else %}
+                    <div class="bg-light d-flex align-items-center justify-content-center"
+                         style="height: 220px;">
+                        <span class="text-muted">No image</span>    
+                    </div>
+                {% endif %}
+
+                <div class="card-body d-flex flex-column">
+                    <div class="d-flex justify-content-between align-items-start">
+                        <h5 class="mb-1">{{ product.name }}</h5>
+
+                        {% if product.stock > 0 %}
+                            <span class="badge bg-success">In stock</span>
+                        {% else %}
+                            <span class="badge bg-danger">Out of stock</span>
+                        {% endif %}
+                    </div>
+
+                    <div class="mb-2">
+                        {% if product.avg_rating %}
+                            <div class="stars">
+
+                                <span class="stars-empty">
+                                    ★★★★★
+                                </span>
+
+                                <span class="stars-filled"
+                                      style="width: {{ product.rating_percent }}%;">
+                                    ★★★★★
+                                </span>
+                            
+                            </div>
+
+                            <small class="text-muted">
+                                ({{ product.review_count }})
+                                {{ product.avg_rating|floatformat:1 }}
+                            </small>
+                        {% else %}
+
+                            <small class="text-muted">
+                                No reviews
+                            </small>
+                        
+                        {% endif %}
+                    </div>
+
+                    <p class="fw-bold mb-2">{{ product.price }} €</p>
+
+                    <div class="mt-auto d-flex justify-content-between align-items-center">
+                        <form action="{% url 'cart:add_to_cart' product.id %}" method="post">
+                            {% csrf_token%}
+
+                            <div class="d-flex gap-2">
+                                <input
+                                    type="number"
+                                    name="quantity"
+                                    value="1"
+                                    min="1"
+                                    class="form-control form-control-sm"
+                                    style="width: 80px;"
+                                    max="{{ product.stock }}"
+                                >
+
+                                <button type="submit" class="btn btn-success btn-sm">
+                                    Add to cart
+                                </button>
+                            </div>
+                        </form>
+                        <!--<a href="{% url 'cart:add_to_cart' product.id %}" class="btn btn-success btn-primary">
+                        Add to cart
+                        </a>-->
+
+                        <a href="{% url 'shop:product_detail' product.id %}" class="btn btn-primary btn-sm">View</a>
+                    </div>
+
+                </div>
+                
+            </div>
+        
+        </div>
+
+    {% empty %}
+
+        <div class="col-12 text-center mt-4">
+            <h4>No products found</h4>
+            <p>Try adjusting your search filters.</p>
+        </div>
+
+    {% endfor %}
+</div>
+
+<style>
+
+.stars {
+    position: relative;
+    display: inline-block;
+    width: 83px;
+    height: 20px;
+    font-size: 20px;
+    line-height: 20px;
+    vertical-align: middle;
+    margin-right: 5px;
+}
+
+.stars-empty,
+.stars-filled {
+    position: absolute;
+    top: 0;
+    left: 0;
+    white-space: nowrap;
+
+}
+
+.stars-empty {
+    color: #ddd;
+}
+
+.stars-filled{
+    color: #ffc107;
+    overflow: hidden;
+}
+
+</style>
+                        
+
+{% endblock %}
+

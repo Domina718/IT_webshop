@@ -1,0 +1,140 @@
+{% extends 'base.html' %}
+
+{% block content %}
+
+<div class="row">
+    <div class="col-md-6">
+
+        {% if product.image %}
+        <img src="{{ product.image.url }}" class="img-fluid">
+        {% endif %}
+    </div>
+
+    <div class="col-md-6">
+
+        <h2>{{ product.name }}</h2>
+        <h4>{{ product.price }}€</h4>
+        <p>{{ product.description }}</p>
+
+        <hr>
+
+        <p><b>Socket:</b> {{ product.socket }}</p>
+        <p><b>RAM:</b> {{ product.ram_type }}</p>
+    </div>
+
+    <hr>
+
+    <h4>Reviews</h4>
+
+    {% if average_rating %}
+        <p><b>Average rating:</b> {{ average_rating|floatformat:1}} / 5</p>
+    {% else %}
+        <p>No ratings yet.</p>
+    {% endif %}
+
+    <hr>
+
+    {% for review in reviews %}
+        <div class="border p-2 mb-2">
+            <b>{{ review.user.username }}</b>
+            <span>({{ review.rating }}/5)</span>
+            <p>{{ review.comment }}</p>
+            <small>{{ review.created }}</small>
+        </div>
+    {% empty %}
+        <p>No reviews yet.</p>
+    {% endfor %}
+
+
+    <hr>
+    <h5>Add review</h5>
+    <form method="post">
+        {% csrf_token %}
+        {{ form.rating.label_tag }}
+        <div class="star-rating mb-2">
+            <span data-value="1">★</span>
+            <span data-value="2">★</span>
+            <span data-value="3">★</span>
+            <span data-value="4">★</span>
+            <span data-value="5">★</span>
+        </div>
+    
+        
+        
+        {{ form.rating }}
+
+        <div class="mb-2">
+            {{ form.comment.label_tag }}
+            {{ form.comment }}
+        </div>
+
+        <button class="btn btn-primary">Submit review</button>
+    </form>
+
+</div>
+<style>
+.star-rating span{
+    color: #ddd;
+    transition: color 0.2s ease;
+}
+
+.star-rating {
+    font-size: 40px;
+    cursor: pointer;
+    display: inline-block;
+}
+
+.star-rating span.active,
+.star-rating span.hovered {
+    color: gold;
+}
+
+</style>
+
+<script>
+
+const stars = document.querySelectorAll('.star-rating span');
+const ratingInput = document.querySelector('input[name="rating"]');
+
+function clearStars() {
+    stars.forEach(star => {
+        star.classList.remove('hovered');
+        star.classList.remove('active');
+    });
+}
+
+function paintStars(value, className) {
+    clearStars();
+
+    for (let i = 0; i < value; i++) {
+        stars[i].classList.add(className);
+    }
+}
+
+stars.forEach(star => {
+    star.addEventListener('mouseover', function() {
+        let value = parseInt(this.dataset.value);
+        paintStars(value, 'hovered');
+    });
+
+    star.addEventListener('click', function() {
+        let value = parseInt(this.dataset.value);
+        ratingInput.value = value;
+        paintStars(value, 'active');
+    });
+});
+document.querySelector('.star-rating').addEventListener('mouseleave', function() {
+    clearStars();
+
+    if (ratingInput.value) {
+        paintStars(parseInt(ratingInput.value), 'active');
+    }
+});
+
+if (ratingInput.value) {
+    paintStars(parseInt(ratingInput.value), 'active');
+}
+
+</script>
+
+{% endblock %}

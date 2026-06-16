@@ -1,0 +1,64 @@
+{% extends 'base.html' %}
+
+{% block content %}
+
+<div class="container mt-4">
+
+    <h2>Checkout</h2>
+
+    <div class="row">
+
+        <div class="col-md-8">
+
+            <form method="post">
+
+                {% csrf_token %}
+
+                {{ form.as_p }}
+
+                <button
+                    type = "submit"
+                    class = "btn btn-success">
+
+                    Place Order
+                </button>
+            </form>
+        </div>
+
+        <div class="col-md-4">
+
+            <div class="card">
+
+                <div class="card-body">
+
+                    <h5>Your Order</h5>
+
+                    <hr>
+
+                    {% for item in cart %}
+
+                    <p>
+                        {{ item.product.name }}
+                        x {{ item.quantity }}
+                    </p>
+
+                    {% endfor %}
+
+                    <hr>
+
+                    <strong>
+                        Total:
+                        €{{ total }}
+                    </strong>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</div>
+
+{% endblock %}
