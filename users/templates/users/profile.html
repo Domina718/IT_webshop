@@ -2,25 +2,115 @@
 
 {% block content %}
 
-<h2>My Profile</h2>
 
-<div clas="card p-3 mb-4">
-    <p><b>Username:</b> {{ user.username }}</p>
-    <p><b>Email:</b> {{ user.email }}</p>
-</div>
+<div class="container mt-4">
 
-<h4>My Orders</h4>
+    <h2 class="mb-4">My Profile</h2>
 
-{% for order in orders %}
+    <div class="card shadow-sm mb-4">
 
-    <div class="card p-2 mb-2">
-        <p>Order #{{ order.id }}</p>
-        <p>{{ order.created }}</p>
+        <div class="card-body">
+
+            <h5 class="mb-3">Account</h5>
+
+            <p>
+                <strong>Username:</strong>
+                {{ user.username }}
+            </p>
+
+            <p>
+                <strong>Email:</strong>
+                {% if user.email %}
+                    {{ user.email }}
+                {% else %}
+                    <span class="text-muted">
+                        Not provided
+                    </span>
+                {% endif %}
+            </p>
+        </div>
     </div>
 
-{% empty %}
-    <p>No orders yet.</p>
 
-{% endfor %}
+    <div class="card shadow-sm mb-4">
+
+        <div class="card-body">
+
+            <h5 class="mb-3">Personal information</h5>
+
+            <p>
+                <strong>Name:</strong>
+                {{ user.profile.first_name }}
+                {{ user.profile.last_name }}
+            </p>
+
+            <p>
+                <strong>Phone:</strong>
+                {{ user.profile.phone }}
+            </p>
+
+            <p>
+                <strong>Country:</strong>
+                {{ user.profile.country }}
+            </p>
+
+            <p>
+                <strong>Address:</strong>
+                {{ user.profile.address }}
+            </p>
+
+            <p>
+                <strong>City:</strong>
+                {{ user.profile.city }}
+            </p>
+
+            <p>
+                <strong>Postal code:</strong>
+                {{ user.profile.postal_code }}
+            </p>
+
+            <a href="{% url 'users:edit_profile' %}"
+            class="btn btn-primary">
+                Edit Personal Info
+            </a>
+        </div>
+    </div>
+
+    <div class="card shadow-sm">
+
+        <div class="card-body">
+
+            <h5 class="mb-3">My orders</h5>
+
+            {% for order in orders %}
+
+                <div class="border rounded p-2 mb-2">
+
+                    <strong>
+                        Order #{{ order.id }}
+                    </strong>
+
+                    <br>
+
+                    {{ order.created }}
+
+                    <br>
+
+                    <a href="{% url 'orders:order_detail' order.id %}"
+                    class="btn btn-sm btn-outline-primary mt-2">
+                        View Order
+                    </a>
+                </div>
+
+                {% empty %}
+
+                    <p>No orders yet.</p>
+
+                {% endfor %}
+        </div>
+
+    </div>
+    
+</div>
 
 {% endblock %}

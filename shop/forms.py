@@ -9,7 +9,8 @@ class ReviewForm(forms.ModelForm):
     rating = forms.TypedChoiceField(
         choices = RATING_CHOICES,
         coerce = int,
-        widget = forms.HiddenInput()
+        widget = forms.HiddenInput(),
+        required = True
     )
     class Meta:
         model = Review

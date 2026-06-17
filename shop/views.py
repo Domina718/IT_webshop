@@ -49,8 +49,11 @@ def product_list(request):
     })
 
 def product_detail(request, pk):
+
     product = get_object_or_404(
-        Product.objects.annotate(avg_rating=Avg('reviews__rating')), 
+        Product.objects.annotate(
+            avg_rating=Avg('reviews__rating'),
+            review_count=Count('reviews')), 
         pk=pk
     )
 
@@ -78,6 +81,9 @@ def product_detail(request, pk):
 
     average_rating = product.avg_rating
     reviews = product.reviews.all()
+
+    if average_rating:
+        product.rating_percent = float(average_rating / 5 * 100)
 
     user_review = None
 

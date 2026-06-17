@@ -48,6 +48,26 @@ class Product(models.Model):
         blank = True
     )
 
+    storage_type = models.CharField(
+        max_length = 50,
+        blank = True
+    )
+
+    power_required = models.IntegerField(
+        blank = True,
+        null = True
+    )
+
+    gpu_length = models.IntegerField(
+        blank = True, 
+        null = True
+    )
+
+    form_factor = models.CharField(
+        max_length = 50,
+        blank = True
+    )
+
     def __str__(self):
         return self.name
     
@@ -70,7 +90,7 @@ class Review(models.Model):
         ]
     )
 
-    comment = models.TextField()
+    comment = models.TextField(blank=True)
 
     created = models.DateTimeField(auto_now_add=True)
     updated = models.DateTimeField(auto_now=True)

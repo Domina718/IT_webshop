@@ -1,0 +1,49 @@
+
+
+.stars {
+    position: relative;
+    display: inline-block;
+    width: 85px;
+    height: 20px;
+    font-size: 20px;
+    line-height: 20px;
+    vertical-align: middle;
+    margin-right: 5px;
+}
+
+.stars-empty,
+.stars-filled {
+    position: absolute;
+    top: 0;
+    left: 0;
+    white-space: nowrap;
+
+}
+
+.stars-empty {
+    color: #ddd;
+}
+
+.stars-filled{
+    color: #ffc107;
+    overflow: hidden;
+}
+
+.review-stars {
+    font-size: 22px;
+    letter-spacing: 0;
+}
+
+.review-stars .filled {
+    color: #ffc107;
+}
+
+.review-stars .empty {
+    color: #ddd;
+}
+
+.review-form textarea {
+    resize: none;
+}
+
+        

@@ -43,14 +43,35 @@ def order_create(request):
             )
         
     else:
-        form = OrderCreateForm()
+       
+        initial_data = {}
+
+        if request.user.is_authenticated:
+           
+            profile = request.user.profile
+
+            initial_data = {
+               'first_name': profile.first_name,
+               'last_name': profile.last_name,
+               'email': profile.last_name,
+               'phone': profile.phone,
+               'country': profile.country,
+               'address': profile.address,
+               'city': profile.city,
+               'postal_code': profile.postal_code,
+            }
+
+        form = OrderCreateForm(
+            initial = initial_data
+        )
 
     return render(
         request, 
         'orders/checkout.html',
         {
             'cart' : cart,
-            'form' : form
+            'form' : form,
+            'total' : cart.get_total_price()
         }
     )
 

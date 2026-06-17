@@ -1,0 +1,13 @@
+<div class="review-stars">
+    
+    {% for i in "12345" %}
+
+        {% if forloop.counter <= rating %}
+            <span class="filled">★</span>
+        {% else %}
+            <span class="empty">★</span>
+        {% endif %}
+    
+    {% endfor %}
+
+</div>

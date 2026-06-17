@@ -1,0 +1,13 @@
+.star-rating {
+    font-size:40px;
+    cursor:pointer;
+}
+
+.star-rating span {
+    color: #ddd;
+}
+
+.star-rating span.active,
+.star-rating span.hovered {
+    color:gold;
+}

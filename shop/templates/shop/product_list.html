@@ -90,18 +90,8 @@
 
                     <div class="mb-2">
                         {% if product.avg_rating %}
-                            <div class="stars">
-
-                                <span class="stars-empty">
-                                    ★★★★★
-                                </span>
-
-                                <span class="stars-filled"
-                                      style="width: {{ product.rating_percent }}%;">
-                                    ★★★★★
-                                </span>
                             
-                            </div>
+                            {% include 'shop/components/rating_bar.html' with rating_percent=product.rating_percent %}
 
                             <small class="text-muted">
                                 ({{ product.review_count }})
@@ -159,41 +149,8 @@
         </div>
 
     {% endfor %}
-</div>
-
-<style>
-
-.stars {
-    position: relative;
-    display: inline-block;
-    width: 83px;
-    height: 20px;
-    font-size: 20px;
-    line-height: 20px;
-    vertical-align: middle;
-    margin-right: 5px;
-}
-
-.stars-empty,
-.stars-filled {
-    position: absolute;
-    top: 0;
-    left: 0;
-    white-space: nowrap;
-
-}
-
-.stars-empty {
-    color: #ddd;
-}
-
-.stars-filled{
-    color: #ffc107;
-    overflow: hidden;
-}
-
-</style>
-                        
+    
+</div>   
 
 {% endblock %}
 
