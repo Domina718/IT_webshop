@@ -1,9 +1,10 @@
 from django.shortcuts import render,redirect
 from django.contrib import messages
-from django.contrib.auth import login
+from django.contrib.auth import login, logout, update_session_auth_hash
+from django.contrib.auth.views import LoginView
 from django.contrib.auth.decorators import login_required
 from orders.models import Order
-from .forms import RegisterForm, ProfileForm
+from .forms import RegisterForm, ProfileForm, CustomPasswordChangeForm
 from .models import Profile
 
 
@@ -108,3 +109,71 @@ def edit_profile(request):
             'form': form
         }
     )
+
+
+@login_required
+def change_password(request):
+
+    if request.method == 'POST':
+
+        form = CustomPasswordChangeForm(
+            user = request.user,
+            data = request.POST
+        )
+
+        if form.is_valid():
+
+            user = form.save()
+
+            update_session_auth_hash(
+                request,
+                user
+            )
+
+            messages.success(
+                request,
+                "Password changed successfully!"
+            )
+
+            return redirect('users:profile')
+    else:
+
+        form = CustomPasswordChangeForm(
+            user = request.user
+        )
+
+    return render(
+        request,
+        'users/change_password.html',
+        {
+            'form': form
+        }
+    )
+
+
+def custom_logout(request):
+
+    logout(request)
+
+    messages.success(
+        request,
+        "You have been logged out successfully."
+    )
+
+    return redirect('shop:product_list')
+
+class CustomLoginView(LoginView):
+
+    template_name = 'registration/login.html'
+
+    def dispatch(self, request, *args, **kwargs):
+
+        if request.user.is_authenticated:
+
+            return redirect('users:profile')
+        
+        return super().dispatch(
+            request,
+            *args,
+            **kwargs
+        )

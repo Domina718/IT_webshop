@@ -1,12 +1,20 @@
 from django.db import models
 from django.contrib.auth.models import User
 from shop.models import Product
+import uuid
 
 class Order(models.Model):
+    token = models.UUIDField(
+        default = uuid.uuid4,
+        editable=False,
+        unique=True
+    )
     user = models.ForeignKey(
         User, 
         on_delete = models.CASCADE,
-        related_name = 'orders'
+        related_name = 'orders',
+        null=True,
+        blank=True
     )
 
     first_name = models.CharField(max_length=100)

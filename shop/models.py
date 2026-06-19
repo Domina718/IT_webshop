@@ -58,8 +58,18 @@ class Product(models.Model):
         null = True
     )
 
+    psu_wattage = models.IntegerField(
+        blank = True,
+        null = True
+    )
+
     gpu_length = models.IntegerField(
         blank = True, 
+        null = True
+    )
+
+    max_gpu_length = models.IntegerField(
+        blank = True,
         null = True
     )
 

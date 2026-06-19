@@ -53,7 +53,7 @@ def order_create(request):
             initial_data = {
                'first_name': profile.first_name,
                'last_name': profile.last_name,
-               'email': profile.last_name,
+               'email': request.user.email,
                'phone': profile.phone,
                'country': profile.country,
                'address': profile.address,
@@ -89,3 +89,11 @@ def order_detail(request, order_id):
 
     return render(request, 'orders/order_detail.html', {'order': order})
 
+def guest_order_detail(request, token):
+
+    order = get_object_or_404(
+        Order.objects.prefetch_related('items__product'),
+        token = token
+    )
+
+    return render(request,'orders/order_detail.html',{'order': order})

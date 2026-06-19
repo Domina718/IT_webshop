@@ -1,7 +1,9 @@
 from django.shortcuts import render, get_object_or_404, redirect
 from django.db.models import Avg, Q, Count
 from .models import Product, Category, Review
+from compatibility.models import CompatibilityRule
 from .forms import ReviewForm
+from orders.models import OrderItem
 
 
 def product_list(request):
@@ -48,6 +50,8 @@ def product_list(request):
         'max_price': max_price
     })
 
+
+
 def product_detail(request, pk):
 
     product = get_object_or_404(
@@ -82,10 +86,29 @@ def product_detail(request, pk):
     average_rating = product.avg_rating
     reviews = product.reviews.all()
 
+    compatibility_rules = CompatibilityRule.objects.filter(
+        Q(product=product) |
+        Q(compatible_product=product)
+    ).select_related(
+        'product',
+        'compatible_product'
+    )
+
+    recommended_products = Product.objects.filter(
+        order_items__order__items__product = product
+    ).exclude(
+        id=product.id
+    ).annotate(
+        purchase_count=Count('id')
+    ).order_by(
+        '-purchase_count'
+    )[:4]
+
     if average_rating:
         product.rating_percent = float(average_rating / 5 * 100)
 
     user_review = None
+    form = None
 
     if request.user.is_authenticated:
         user_review = Review.objects.filter(
@@ -104,4 +127,6 @@ def product_detail(request, pk):
         'average_rating': average_rating,
         'form': form,
         'user_review': user_review,
+        'compatibility_rules': compatibility_rules,
+        'recommended_products': recommended_products,
     })
