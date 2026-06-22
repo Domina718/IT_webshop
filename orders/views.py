@@ -1,14 +1,20 @@
 from django.shortcuts import render, redirect, get_object_or_404
 from .models import OrderItem, Order
 from .forms import OrderCreateForm
-from cart.cart import Cart
+from cart.cart import Cart, DatabaseCart
 from django.contrib.auth.decorators import login_required
 from decimal import Decimal
+from django.contrib import messages
+from django.db import transaction
+from django.core.exceptions import ValidationError
+from shop.models import Product
 
-#@login_required
 def order_create(request):
 
-    cart = Cart(request)
+    if request.user.is_authenticated:
+        cart = DatabaseCart(request.user)
+    else:
+        cart = Cart(request)
 
     if len(cart) == 0:
         return redirect('shop:product_list')
@@ -18,21 +24,51 @@ def order_create(request):
 
         if form.is_valid():
 
-            order = form.save(commit=False)
-
-            if request.user.is_authenticated:
-                order.user = request.user
-
-            order.save()
-
             for item in cart:
 
-                OrderItem.objects.create(
-                    order = order,
-                    product = item['product'],
-                    price = Decimal(item['price']),
-                    quantity = item['quantity']
-                )
+                if item['quantity'] > item['product'].stock:
+                    messages.error(
+                        request,
+                        f"Not enough stock for {item['product'].name}."
+                    )
+                    return redirect ('cart:cart_detail')
+                
+            try:
+
+                with transaction.atomic():
+
+                    order = form.save(commit=False)
+
+                    if request.user.is_authenticated:
+                        order.user = request.user
+
+                    order.save()
+
+                    for item in cart:
+
+                        product = Product.objects.select_for_update().get(
+                            pk = item['product'].pk
+                        )
+
+                        if product.stock < item['quantity']:
+
+                            raise ValidationError(f"Not enough stock for {product.name}.")
+
+                        OrderItem.objects.create(
+                            order = order,
+                            product = product,
+                            price = Decimal(item['price']),
+                            quantity = item['quantity']
+                        )
+                    
+                        product.stock -= item['quantity']
+                        product.save()
+
+            except ValidationError as e:
+
+                messages.error(request, str(e))
+
+                return redirect
 
             cart.clear()
 

@@ -6,6 +6,8 @@ from django.contrib.auth.decorators import login_required
 from orders.models import Order
 from .forms import RegisterForm, ProfileForm, CustomPasswordChangeForm
 from .models import Profile
+from cart.cart import Cart
+from cart.models import UserCart, UserCartItem
 
 
 
@@ -14,8 +16,31 @@ def register(request):
         form = RegisterForm(request.POST)
 
         if form.is_valid():
+
+            old_cart = request.session.get('cart', {})
+
             user = form.save()
+
             login(request, user)
+
+            if old_cart:
+                user_cart, created = UserCart.objects.get_or_create(
+                    user = user
+                )
+
+                for product_id, item in old_cart.items():
+                    cart_item, created = UserCartItem.objects.get_or_create(
+                        cart = user_cart,
+                        product_id = product_id,
+                        defaults = {'quantity': item['quantity']}
+                    )
+
+                if not created:
+                    cart_item.quantity += item['quantity']
+                    cart_item.save()
+
+                request.session['cart'] = {}
+                request.session.modified = True
 
             messages.success(request, "Account created successfully!")
             return redirect('shop:product_list')
@@ -177,3 +202,35 @@ class CustomLoginView(LoginView):
             *args,
             **kwargs
         )
+    
+    def form_valid(self, form):
+        
+        response = super().form_valid(form)
+
+        session_cart = self.request.session.get('cart', {})
+
+        if session_cart:
+
+            user_cart, created = UserCart.objects.get_or_create(
+                user = self.request.user
+            )
+
+            for product_id, item in session_cart.items():
+
+                cart_item, created = UserCartItem.objects.get_or_create(
+                    cart = user_cart,
+                    product_id = product_id,
+                    defaults = {'quantity': 0}
+                )
+
+                cart_item.quantity += item['quantity']
+                cart_item.save()
+
+      
+
+            self.request.session['cart'] = {}
+            self.request.session.modified = True
+
+        return response
+
+                                            

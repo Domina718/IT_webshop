@@ -3,7 +3,7 @@ from django.db.models import Avg, Q, Count
 from .models import Product, Category, Review
 from compatibility.models import CompatibilityRule
 from .forms import ReviewForm
-from orders.models import OrderItem
+from .models import Product
 
 
 def product_list(request):
@@ -70,6 +70,7 @@ def product_detail(request, pk):
 
         if form.is_valid():
 
+
             Review.objects.update_or_create(
                 product = product,
                 user = request.user,
@@ -91,8 +92,41 @@ def product_detail(request, pk):
         Q(compatible_product=product)
     ).select_related(
         'product',
-        'compatible_product'
+        'compatible_product',
+        'product__category',
+        'compatible_product__category'
     )
+
+    COMPATIBILITY_LABELS = {
+        "CPU": "CPUs",
+        "Motherboard": "Motherboards",
+        "RAM": "RAM Modules",
+        "SSD": "SSDs",
+        "GPU": "Graphics Cards",
+        "PSU": "Power Supplies",
+        "Case": "Cases",
+    }
+
+    compatibility_groups = {}
+
+    for rule in compatibility_rules:
+
+        if rule.product == product:
+            compatible_product = rule.compatible_product
+        else:
+            compatible_product = rule.product
+
+        label = COMPATIBILITY_LABELS.get(
+            compatible_product.category.name, 
+            compatible_product.category.name
+        )
+
+        compatibility_groups.setdefault(label, [])
+
+        if compatible_product.id not in [
+            p.id for p in compatibility_groups[label]
+        ]:
+            compatibility_groups[label].append(compatible_product)
 
     recommended_products = Product.objects.filter(
         order_items__order__items__product = product
@@ -127,6 +161,12 @@ def product_detail(request, pk):
         'average_rating': average_rating,
         'form': form,
         'user_review': user_review,
-        'compatibility_rules': compatibility_rules,
+        'compatibility_groups': compatibility_groups,
         'recommended_products': recommended_products,
     })
+
+def home(request):
+
+    products = Product.objects.all()[:8]
+
+    return render(request, 'shop/home.html', {'products': products})

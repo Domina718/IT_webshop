@@ -45,6 +45,30 @@
                                class="text-decoration-none">
                                 {{ item.product.name }}</h5>
                             </a>
+                        {% if item.quantity > item.product.stock %}
+
+                            <div class="alert alert-danger py-2">
+                                Requested quantity is not available.
+                                Available stock: {{ item.product.stock }}
+                            </div>
+
+                            <form action="{% url 'cart:update_cart' item.product.id %}"
+                                  method="post"
+                                  class="mt-2">
+                                
+                                {% csrf_token %}
+
+                                <input type="hidden"
+                                       name="quantity"
+                                       value="{{ item.product.stock }}">
+
+                                <button class="btn btn-warning btn-sm">
+                                    Set quantity to available stock
+                                </button>
+                                
+                            </form>
+                            
+                        {% endif %}
 
                         <p class="mb-1 text-muted">
                             Unit price: {{ item.price }} €
@@ -146,10 +170,25 @@
 
             <hr>
 
+            {% if not has_stock_problem %}
+
             <a href="{% url 'orders:checkout' %}"
                class="btn btn-success btn-lg w-100 mb-2">
                 🛒 Proceed to Checkout
             </a>
+
+            {% else %}
+
+            <a class="btn btn-secondary btn-lg w-100 mb-2" disabled>
+                🛒 Proceed to Checkout
+            </a>
+
+            <p class="text-danger text-center small">
+                Please update your cart before checkout.
+            </p>
+
+            {% endif %}
+
 
             <a href="{% url 'shop:product_list' %}"
                class="btn btn-outline-primary w-100 mt-2">
