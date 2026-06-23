@@ -16,6 +16,10 @@ def product_list(request):
     category_id = request.GET.get('category', '')
     min_price = request.GET.get('min', '')
     max_price = request.GET.get('max', '')
+    brand = request.GET.get('brand', '')
+    socket = request.GET.get('socket', '')
+    ram_type = request.GET.get('ram_type', '')
+    storage_type = request.GET.get('storage_type', '')
 
     if query:
         products = products.filter(
@@ -32,6 +36,24 @@ def product_list(request):
     if max_price and max_price.strip() != "":
         products = products.filter(price__lte=float(max_price))
 
+    if brand:
+        products = products.filter(brand = brand)
+
+    if socket:
+        products = products.filter(socket = socket)
+
+    if ram_type:
+        products = products.filter(ram_type = ram_type)
+
+    if storage_type:
+        products = products.filter(storage_type = storage_type)
+
+    brands = Product.objects.exclude(brand='').values_list('brand', flat=True).distinct()
+    sockets = Product.objects.exclude(socket='').values_list('socket', flat=True).distinct()
+    ram_types = Product.objects.exclude(ram_type='').values_list('ram_type', flat=True).distinct()
+    storage_types = Product.objects.exclude(storage_type='').values_list('storage_type', flat=True).distinct()
+
+
     products = products.annotate(
         avg_rating = Avg('reviews__rating'),
         review_count = Count('reviews')
@@ -47,7 +69,15 @@ def product_list(request):
         'query' : query,
         'category_id': category_id,
         'min_price': min_price,
-        'max_price': max_price
+        'max_price': max_price,
+        'brands': brands,
+        'sockets': sockets,
+        'ram_types': ram_types,
+        'storage_types': storage_types,
+        'brand': brand,
+        'socket': socket,
+        'ram_type': ram_type,
+        'storage_type': storage_type,
     })
 
 

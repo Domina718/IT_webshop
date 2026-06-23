@@ -23,18 +23,28 @@ class ProductAdmin(admin.ModelAdmin):
 
     list_display = (
         'name',
+        'brand',
         'category',
         'price',
         'stock',
+        'socket',
+        'ram_type',
+        'storage_type',
     )
 
     list_filter = (
         'category', 
-        'stock',
+        'brand',
+        'socket',
+        'ram_type',
+        'storage_type',
+        'nvme_support',
     )
 
     search_fields = (
         'name', 
+        'brand',
+        'model_number',
         'category__name',
     )
 

@@ -5,7 +5,7 @@
 
 <div class="row">
 
-    <form method="get" class="mb-3">
+    <form method="get" class="mb-3 product-filter-form">
 
         <div class="row g-2">
 
@@ -37,6 +37,50 @@
             </div>
 
             <div class="col-md">
+                <select name="brand" class="form-select mb-2">
+                    <option value="">All brands</option> 
+                    {% for item in brands %}
+                        <option value="{{ item }}" {% if brand == item %}selected{% endif %}>
+                            {{ item }}
+                        </option>
+                    {% endfor %}
+                </select>
+            </div>
+
+            <div class="col-md">
+                <select name="socket" class="form-select mb-2">
+                    <option value="">All sockets</option>
+                    {% for item in sockets %}
+                        <option value="{{ item }}" {% if socket == item %}selected{% endif %}>
+                            {{ item }}
+                        </option>
+                    {% endfor %}
+                </select>
+            </div>
+
+            <div class="col-md">
+                <select name="ram_type" class="form-select mb-2">
+                    <option value="">All RAM types</option>
+                    {% for item in ram_types %}
+                        <option value="{{ item }}" {% if ram_type == item %}selected{% endif %}>
+                            {{ item }}
+                        </option>
+                    {% endfor %}
+                </select>
+            </div>
+
+            <div class="col-md">
+                <select name="storage_type" class="form-select mb-2">
+                    <option value="">All Storage</option>
+                    {% for item in storage_types %}
+                        <option value="{{ item }}" {% if storage_type == item %}selected{% endif %}>
+                            {{ item }}
+                        </option>
+                    {% endfor %}
+                </select>
+            </div>
+
+            <div class="col-md">
                 <input type="number"
                     name="min"
                     value="{{ min_price }}"
@@ -54,8 +98,11 @@
 
             <div class="col-md-auto">
                 <button class="btn btn-primary">Filter</button>
+                <a href="{% url 'shop:product_list' %}" class="btn btn-outline-secondary">
+                    Reset
+                </a>
             </div>
-
+        
         </div>
         
     </form>
