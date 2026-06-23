@@ -15,6 +15,8 @@ def add_to_cart(request, product_id):
     )
 
     quantity = int(request.POST.get('quantity', 1))
+    requested_quantity = int(request.POST.get('quantity', 1))
+
 
     if request.user.is_authenticated:
         
@@ -27,19 +29,19 @@ def add_to_cart(request, product_id):
             product = product
         ).first()
 
-        if existing_item:
-            new_quantity = existing_item.quantity + quantity
-        else:
-            new_quantity = quantity
+        current_quantity = existing_item.quantity if existing_item else 0
+        available_quantity = product.stock - current_quantity
 
-        if new_quantity > product.stock:
-                
-                return JsonResponse({  
+        if available_quantity <= 0:
+            return JsonResponse({  
                     "ok": False,
-                    "type": "error",
-                    "message": f"Only {product.stock} units of {product.name} are available."
+                    "type": "warning",
+                    "message": f"No more units of {product.name} are available."
                 })
         
+        quantity_to_add = min(requested_quantity, available_quantity)
+        new_quantity = current_quantity + quantity_to_add
+
         cart_item, created = UserCartItem.objects.get_or_create(
             cart = user_cart,
             product = product
@@ -56,22 +58,32 @@ def add_to_cart(request, product_id):
         if str(product.id) in cart.cart:
             current_quantity = cart.cart[str(product.id)]['quantity']
 
-        new_quantity = current_quantity + quantity
+        available_quantity_quantity = product.stock - current_quantity
 
-        if new_quantity > product.stock:
+        if available_quantity <= 0:
+
+            return JsonResponse({  
+                    "ok": False,
+                    "type": "warning",
+                    "message": f"No more units of {product.name} are available."
+            })
+        
+        quantity_to_add = min(requested_quantity, available_quantity)
+        cart.add(product_id, quantity_to_add)
+
+    if quantity_to_add < requested_quantity:
+
 
             return JsonResponse({
-                    "ok": False,
-                    "type": "error",
-                    "message": f"Only {product.stock} units of {product.name} are available."
+                    "ok": True,
+                    "type": "warning",
+                    "message": f"Only {quantity_to_add}x {product.name} added. Stock limit reached."
                 })
-
-        cart.add(product_id, quantity)
     
     return JsonResponse({
                     "ok": True,
                     "type": "success",
-                    "message": f"{quantity}x  {product.name} added to cart ✓"
+                    "message": f"{quantity_to_add}x  {product.name} added to cart ✓"
                 })
 
 
@@ -165,7 +177,7 @@ def update_cart(request, product_id):
         if quantity <= 0:
             item.delete()
             deleted = True
-            
+
         cart.update(product_id, quantity)
 
     return JsonResponse({

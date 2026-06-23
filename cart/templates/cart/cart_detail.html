@@ -21,129 +21,131 @@
 
     <div class="col-lg-8">
 
+        <div id="cart-items">
+
         {% for item in cart %}
 
-        <div class="card mb-3 shadow-sm"
-            data-cart-item="{{ item.product.id }}">
-            <div class="row g-0">
+            <div class="card mb-3 shadow-sm"
+                data-cart-item="{{ item.product.id }}">
+                <div class="row g-0">
 
-                <div class="col-md-3">
-                    {% if item.product.image %}
-                        <img src="{{ item.product.image.url }}"
-                             class="img-fluid rounded-start"
-                             style="height: 100%; object-fit: cover;">
-                    {% else %}
-                        <div class="bg-light d-flex align-items-center justify-content-center h-100">
-                            No image
-                        </div>
-                    {% endif %}
-                </div>
-
-                <div class="col-md-6">
-                    <div class="card-body">
-                        <h5 class="card-title">
-                            <a href="{% url 'shop:product_detail' item.product.pk %}"
-                               class="text-decoration-none">
-                                {{ item.product.name }}</h5>
-                            </a>
-                        {% if item.quantity > item.product.stock %}
-
-                            <div class="alert alert-danger py-2">
-                                Requested quantity is not available.
-                                Available stock: {{ item.product.stock }}
+                    <div class="col-md-3">
+                        {% if item.product.image %}
+                            <img src="{{ item.product.image.url }}"
+                                class="img-fluid rounded-start"
+                                style="height: 100%; object-fit: cover;">
+                        {% else %}
+                            <div class="bg-light d-flex align-items-center justify-content-center h-100">
+                                No image
                             </div>
+                        {% endif %}
+                    </div>
+
+                    <div class="col-md-6">
+                        <div class="card-body">
+                            <h5 class="card-title">
+                                <a href="{% url 'shop:product_detail' item.product.pk %}"
+                                class="text-decoration-none">
+                                    {{ item.product.name }}</h5>
+                                </a>
+                            {% if item.quantity > item.product.stock %}
+
+                                <div class="alert alert-danger py-2">
+                                    Requested quantity is not available.
+                                    Available stock: {{ item.product.stock }}
+                                </div>
+
+                                <form action="{% url 'cart:update_cart' item.product.id %}"
+                                    method="post"
+                                    class="mt-2">
+                                    
+                                    {% csrf_token %}
+
+                                    <input type="hidden"
+                                        name="quantity"
+                                        value="{{ item.product.stock }}">
+
+                                    <button class="btn btn-warning btn-sm">
+                                        Set quantity to available stock
+                                    </button>
+                                    
+                                </form>
+                                
+                            {% endif %}
+
+                            <p class="mb-1 text-muted">
+                                Unit price: {{ item.price }} €
+                            </p>
+
+                            <p class="fw-bold item-total">
+                                Total: {{ item.total_price }} €
+                            </p>
 
                             <form action="{% url 'cart:update_cart' item.product.id %}"
-                                  method="post"
-                                  class="mt-2">
-                                
+                                method="post"
+                                class="d-flex align-items-center gap-2">
+
                                 {% csrf_token %}
 
-                                <input type="hidden"
-                                       name="quantity"
-                                       value="{{ item.product.stock }}">
+                                <input
+                                    type = "number"
+                                    name = "quantity"
+                                    value = "{{ item.quantity }}"
+                                    min = "0"
+                                    max="{{ item.product.stock }}"
+                                    class = "form-control form-control-sm update-cart-input"
+                                    style = "width: 80px;"
+                                    data-product-id="{{ item.product.id }}">
 
-                                <button class="btn btn-warning btn-sm">
-                                    Set quantity to available stock
-                                </button>
-                                
+                                <small class="text-muted">Update qty</small>
                             </form>
-                            
-                        {% endif %}
 
-                        <p class="mb-1 text-muted">
-                            Unit price: {{ item.price }} €
-                        </p>
-
-                        <p class="fw-bold item-total">
-                            Total: {{ item.total_price }} €
-                        </p>
-
-                         <form action="{% url 'cart:update_cart' item.product.id %}"
-                               method="post"
-                               class="d-flex align-items-center gap-2">
-
-                            {% csrf_token %}
-
-                            <input
-                                type = "number"
-                                name = "quantity"
-                                value = "{{ item.quantity }}"
-                                min = "0"
-                                max="{{ item.product.stock }}"
-                                class = "form-control form-control-sm update-cart-input"
-                                style = "width: 80px;"
-                                data-product-id="{{ item.product.id }}">
-
-                            <small class="text-muted">Update qty</small>
-                        </form>
-
-                    </div>
-                </div>
-
-                <div class="col-md-3 d-flex align-items-center justify-content-center">
-
-                    <button type="button"
-                            class="btn btn-outline-danger btn-sm remove-from-cart-btn"
-                            data-bs-toggle="modal"
-                            data-bs-target="#removeModal{{ item.product.id }}"
-                            data-product-id="{{ item.product.id }}">
-                        Remove
-                    </button>
-                
-                </div>
-            </div>
-        </div>
-
-        <div class="modal fade"
-             id="removeModal{{ item.product.id }}"
-             tabindex="-1">
-
-             <div class="modal-dialog">
-                <div class="modal-content">
-
-                    <div class="modal-header">
-                        <h5 class="modal-title">Remove item</h5>
-                        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                        </div>
                     </div>
 
-                    <div class="modal-body">
-                        Remove <strong>{{ item.product.name }}</strong> from cart?
-                    </div>
+                    <div class="col-md-3 d-flex align-items-center justify-content-center">
 
-                    <div class="modal-footer">
-                        <button class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
                         <button type="button"
-                               class="btn btn-danger confirm-remove-btn"
-                               data-product-id="{{ item.product.id }}"
-                               data-bs-dismiss="modal">
+                                class="btn btn-outline-danger btn-sm remove-from-cart-btn"
+                                data-bs-toggle="modal"
+                                data-bs-target="#removeModal{{ item.product.id }}"
+                                data-product-id="{{ item.product.id }}">
                             Remove
                         </button>
+                    
                     </div>
-
                 </div>
-             </div>    
-        </div>
+            </div>
+
+            <div class="modal fade"
+                id="removeModal{{ item.product.id }}"
+                tabindex="-1">
+
+                <div class="modal-dialog">
+                    <div class="modal-content">
+
+                        <div class="modal-header">
+                            <h5 class="modal-title">Remove item</h5>
+                            <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                        </div>
+
+                        <div class="modal-body">
+                            Remove <strong>{{ item.product.name }}</strong> from cart?
+                        </div>
+
+                        <div class="modal-footer">
+                            <button class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                            <button type="button"
+                                class="btn btn-danger confirm-remove-btn"
+                                data-product-id="{{ item.product.id }}"
+                                data-bs-dismiss="modal">
+                                Remove
+                            </button>
+                        </div>
+
+                    </div>
+                </div>    
+            </div>
 
         {% empty %}
 
@@ -152,12 +154,14 @@
             </div>
 
         {% endfor %}
+
+        </div>
     
     </div>
 
     <div class="col-lg-4">
 
-        <div class="card shadow-sm p-3 sticky-top" style="top: 20px;">
+        <div id="order-summary" class="card shadow-sm p-3 sticky-top" style="top: 20px;">
 
             <h4>Order Summary</h4>
 

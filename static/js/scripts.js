@@ -101,6 +101,13 @@ document.addEventListener("DOMContentLoaded", function() {
 
                 if (badge) {
                     badge.innerText = data.cart_count;
+
+                    if(data.cart_count > 0) {
+                        badge.classList.remove("d-none");
+                    }
+                    else {
+                        badge.classList.add("d-none");
+                    }
                 }
 
                 const summaryCount = document.getElementById("cart-summary-count");
@@ -114,6 +121,8 @@ document.addEventListener("DOMContentLoaded", function() {
                 if (summaryTotal) {
                     summaryTotal.innerText = `${data.cart_total} €`;
                 }
+
+                showEmptyCartIfNeeded(data.cart_count);
 
                 const modalEl = btn.closest(".modal");
                 if (modalEl) {
@@ -134,6 +143,17 @@ document.addEventListener("DOMContentLoaded", function() {
 
         const quantity = parseInt(input.value);
         const productId = input.dataset.productId;
+
+        if(quantity <= 0) {
+            input.value = 1;
+        
+            const modalEl = document.getElementById("removeModal" + productId);
+            if(modalEl) {
+                const modal = new bootstrap.Modal(modalEl);
+                modal.show();
+            }
+            return;
+        }
 
         fetch("/cart/update/" + productId + "/", {
             method: "POST", 
@@ -156,11 +176,6 @@ document.addEventListener("DOMContentLoaded", function() {
             if (data.ok) {
 
                 if(data.deleted){
-
-                    console.log("deleted =", data.deleted);
-                    console.log("input =", input);
-                    console.log("card =", input.closest("[data-cart-item]"));
-
 
                     const card = input.closest("[data-cart-item]");
 
@@ -232,6 +247,21 @@ document.addEventListener("DOMContentLoaded", function() {
             notify("warning", `Only ${max} units available.`)
         }
     });
+
+    function showEmptyCartIfNeeded(cartCount) {
+        if(cartCount > 0) return;
+
+        const cartItems = document.getElementById("cart-items");
+        const orderSummary = document.getElementById("order-summary");
+
+        if(cartItems) {
+            cartItems.innerHTML = `<p class="text-muted">Your cart is empty.</p>`;
+        }
+
+        if(orderSummary) {
+            orderSummary.remove();
+        }
+    }
 
     function refreshCartBadge() {
         fetch("/cart/count/")
