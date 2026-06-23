@@ -68,7 +68,7 @@ document.addEventListener("DOMContentLoaded", function() {
                 }
                 
                 if (qtyInput) {
-                    qtyInput.value = 1;
+                    qtyInput.value = "1";
                 }
             }
         });
@@ -238,8 +238,16 @@ document.addEventListener("DOMContentLoaded", function() {
             .then(res => res.json())
             .then(data => {
                 const badge = document.getElementById("cart-count");
+
                 if(badge) {
                     badge.innerText = data.count;
+
+                    if(data.count > 0) {
+                        badge.classList.remove("d-none");
+                    }
+                    else {
+                        classList.add("d-none");
+                    }
                 }
             });
     }
