@@ -44,9 +44,33 @@ document.addEventListener("DOMContentLoaded", function() {
     }
 
     document.addEventListener("submit", function(e) {
-        if (e.target.classList.contains("ajax-update-cart-form")){
-            e.preventDefault();
+
+        const form = e.target 
+        if (!form.classList.contains("ajax-update-cart-form")){
+           return;
         }
+
+        e.preventDefault();
+        const quantityInput = form.querySelector("[name='quantity']");
+        const quantity = parseInt = parseInt(quantityInput.value);
+
+        fetch(form.action, {
+            method: "POST",
+            headers: {
+                "X-CSRFToken": getCSRFToken()
+            },
+            body: new URLSearchParams({
+                quantity: quantity
+            })
+        })
+        .then(res => res.json())
+        .then(data => {
+            notify(data.type, data.message);
+
+            if (data.ok && classList.contains("stock-fix-form")) {
+                this.location.reload();
+            }
+        });
     });
 
     document.addEventListener("click", function(e) {

@@ -57,7 +57,7 @@
 
                                     <form action="{% url 'cart:update_cart' item.product.id %}"
                                         method="post"
-                                        class="mt-2">
+                                        class="mt-2 ajax-update-cart-form stock-fix-form">
                                         
                                         {% csrf_token %}
 
@@ -65,7 +65,7 @@
                                             name="quantity"
                                             value="{{ item.product.stock }}">
 
-                                        <button class="btn btn-warning btn-sm">
+                                        <button type="submit" class="btn btn-warning btn-sm">
                                             Set quantity to available stock
                                         </button>
                                         
