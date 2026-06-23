@@ -83,7 +83,7 @@
 
                                 <form action="{% url 'cart:update_cart' item.product.id %}"
                                     method="post"
-                                    class="d-flex align-items-center gap-2">
+                                    class="d-flex align-items-center gap-2 ajax-update-cart-form">
 
                                     {% csrf_token %}
 
@@ -95,7 +95,8 @@
                                         max="{{ item.product.stock }}"
                                         class = "form-control form-control-sm update-cart-input"
                                         style = "width: 80px;"
-                                        data-product-id="{{ item.product.id }}">
+                                        data-product-id="{{ item.product.id }}"
+                                        data-current-quantity="{{ item.quantity }}">
 
                                     <small class="text-muted">Update qty</small>
                                 </form>
@@ -158,7 +159,7 @@
     </div>
 
     <div class="col-lg-4">
-        
+
         {% if cart|length > 0 %}
 
             <div id="order-summary" class="card shadow-sm p-3 sticky-top" style="top: 20px;">

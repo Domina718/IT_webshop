@@ -13,6 +13,9 @@ document.addEventListener("DOMContentLoaded", function() {
 
     function showBanner(message) {
         const el = document.getElementById("globalBanner");
+
+        if(!el) return;
+
         el.innerText = message;
         el.classList.remove("d-none");
 
@@ -22,12 +25,14 @@ document.addEventListener("DOMContentLoaded", function() {
     }
 
     function notify(type, message) {
-        if (type == "success") {
-            showToast(message);
-        }
-        else{
+        if (!message) return;
+            
+        showToast(message);
+        
+        if(type === "warning") {
             showBanner(message);
         }
+        
     }
 
     function updateCartBadge(delta = 1) {
@@ -37,6 +42,12 @@ document.addEventListener("DOMContentLoaded", function() {
         let current = parseInt(el.innerText || "0");
         el.innerText = current + delta;
     }
+
+    document.addEventListener("submit", function(e) {
+        if (e.target.classList.contains("ajax-update-cart-form")){
+            e.preventDefault();
+        }
+    });
 
     document.addEventListener("click", function(e) {
         const btn = e.target.closest(".add-to-cart-btn");
@@ -143,6 +154,7 @@ document.addEventListener("DOMContentLoaded", function() {
 
         const quantity = parseInt(input.value);
         const productId = input.dataset.productId;
+        const oldQuantity = parseInt(input.dataset.currentQuantity || input.defaultValue || "0")
 
         if(quantity <= 0) {
             input.value = 1;
@@ -168,12 +180,30 @@ document.addEventListener("DOMContentLoaded", function() {
         .then(res => res.json())
         .then(data => {
 
-            notify(data.type, data.message);
+            if(data.type === "warning") {
+                notify(data.type, data.message);
+            }
+            else {
+                const newQuantity = parseInt(data.adjusted_quantity);
+                const diff = newQuantity - oldQuantity;
+            
+                if (diff > 0) {
+                    notify("success", `${diff}x ${data.product_name} added to cart`);
+                }
+                else if (diff < 0) {
+                    notify("success", `${Math.abs(diff)}x ${data.product_name} removed from cart`);
+                }
+                else {
+                    notify(data.type, data.message);
+                }
+            }
+        
 
             if(data.adjusted_quantity !== undefined) {
                 input.value = data.adjusted_quantity;
             }
             if (data.ok) {
+                input.dataset.currentQuantity = data.adjusted_quantity;
 
                 if(data.deleted){
 
@@ -250,7 +280,7 @@ document.addEventListener("DOMContentLoaded", function() {
 
     function showEmptyCartIfNeeded(cartCount) {
         cartCount = parseInt(cartCount);
-        
+
         if(cartCount > 0) return;
 
         const cartItems = document.getElementById("cart-items");

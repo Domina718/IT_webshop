@@ -14,9 +14,7 @@ def add_to_cart(request, product_id):
         id = product_id
     )
 
-    quantity = int(request.POST.get('quantity', 1))
     requested_quantity = int(request.POST.get('quantity', 1))
-
 
     if request.user.is_authenticated:
         
@@ -58,7 +56,7 @@ def add_to_cart(request, product_id):
         if str(product.id) in cart.cart:
             current_quantity = cart.cart[str(product.id)]['quantity']
 
-        available_quantity_quantity = product.stock - current_quantity
+        available_quantity = product.stock - current_quantity
 
         if available_quantity <= 0:
 
@@ -121,7 +119,7 @@ def remove_from_cart(request, product_id):
     return JsonResponse({
                     "ok": True,
                     "type": "success",
-                    "message": f"{product_name} removed from cart",
+                    "message": f"{removed_qty}x {product_name} removed from cart",
                     "product_id": product_id,
                     "removed_qty": removed_qty,
                     "cart_count": len(cart),
@@ -185,6 +183,7 @@ def update_cart(request, product_id):
                     "deleted": deleted,
                     "type": "warning" if warning else "success",
                     "message": warning if warning else "Cart updated ✓",
+                    "product_name": product.name,
                     "adjusted_quantity": quantity,
                     "item_total": float(product.price * quantity),
                     "cart_total": float(cart.get_total_price()),
