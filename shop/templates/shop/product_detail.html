@@ -109,6 +109,38 @@
                         <p><b>Form Factor:</b> {{ product.form_factor }}</p>
                     {% endif %}
 
+                    {% if product.brand %}
+                        <p><b>Brand:</b> {{ product.brand }}</p>
+                    {% endif %}
+
+                    {% if product.model_number %}
+                        <p><b>Model:</b> {{ product.model_number }}</p>
+                    {% endif %}
+
+                    {% if product.capacity_gb %}
+                        <p><b>Capacity:</b> {{ product.capacity_gb }} GB</p>
+                    {% endif %}
+
+                    {% if product.memory_speed_mhz %}
+                        <p><b>Memory speed:</b> {{ product.memory_speed_mhz }} MHz</p>
+                    {% endif %}
+
+                    {% if product.cores %}
+                        <p><b>Cores:</b> {{ product.cores }}</p>
+                    {% endif %}
+
+                    {% if product.base_clock_ghz %}
+                        <p><b>Base clock:</b> {{ product.base_clock_ghz }} GHz</p>
+                    {% endif %}
+
+                    {% if product.vram %}
+                        <p><b>VRAM:</b> {{ product.vram }} GB</p>
+                    {% endif %}
+
+                    {% if product.efficiency_rating %}
+                        <p><b>Efficiency:</b> {{ product.efficiency_rating }}</p>
+                    {% endif %}
+
                     {% if product.stock > 0 %}
 
                         <form action="{% url 'cart:add_to_cart' product.id %}"

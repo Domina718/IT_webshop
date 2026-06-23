@@ -38,6 +38,18 @@ class Product(models.Model):
         null = True
     )
 
+    brand = models.CharField(max_length=100, blank=True)
+    model_number = models.CharField(max_length=100, blank=True)
+
+    capacity_gb = models.IntegerField(blank=True, null=True)
+    memory_speed_mhz = models.IntegerField(blank=True, null=True)
+
+    cores = models.IntegerField(blank=True, null=True)
+    base_clock_ghz = models.DecimalField(max_digits=4, decimal_places=2, blank=True, null=True)
+
+    vram_gb = models.IntegerField(blank=True, null=True)
+    efficiency_rating = models.CharField(max_length=50, blank=True)
+
     socket = models.CharField(
         max_length = 50,
         blank = True
@@ -77,6 +89,9 @@ class Product(models.Model):
         max_length = 50,
         blank = True
     )
+
+    nvme_support = models.BooleanField(default=False)
+
 
     def __str__(self):
         return self.name

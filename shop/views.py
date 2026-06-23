@@ -128,6 +128,40 @@ def product_detail(request, pk):
         ]:
             compatibility_groups[label].append(compatible_product)
 
+    if product.category.name == "SSD" and product.storage_type == "NVMe":
+
+        nvme_motherboards = Product.objects.filter(
+            category__name = "Motherboard",
+            nvme_support = True
+        ).exclude(stock=0)
+
+        compatibility_groups.setdefault("Motherboards", [])
+
+        existing_ids = [
+            p.id for p in compatibility_groups["Motherboards"]
+        ]
+
+        for motherboard in nvme_motherboards:
+            if motherboard.id not in existing_ids:
+                compatibility_groups["Motherboards"].append(motherboard)
+
+    if product.category.name == "Motherboard" and product.nvme_support:
+
+        nvme_ssds = Product.objects.filter(
+            category__name = "SSD",
+            storage_type = "NVMe"
+        ).exclude(stock=0)
+
+        compatibility_groups.setdefault("SSDs", [])
+
+        existing_ids = [
+            p.id for p in compatibility_groups["SSDs"]
+        ]
+
+        for ssd in nvme_ssds:
+            if ssd.id not in existing_ids:
+                compatibility_groups["SSDs"].append(ssd)
+
     recommended_products = Product.objects.filter(
         order_items__order__items__product = product
     ).exclude(
