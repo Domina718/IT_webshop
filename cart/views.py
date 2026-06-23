@@ -2,8 +2,9 @@ from django.shortcuts import render, redirect, get_object_or_404
 from shop.models import Product
 from .cart import Cart, DatabaseCart
 from django.views.decorators.http import require_POST
-from django.contrib import messages
 from .models import UserCart, UserCartItem
+from django.http import JsonResponse
+
 
 @require_POST
 def add_to_cart(request, product_id):
@@ -31,24 +32,13 @@ def add_to_cart(request, product_id):
         else:
             new_quantity = quantity
 
-        if existing_item:
-            new_quantity = existing_item.quantity + quantity
-        else:
-           new_quantity = quantity
-
         if new_quantity > product.stock:
-
-                messages.error(
-                    request, 
-                    f"Only {product.stock} units of {product.name} are available."
-                )
-
-                return redirect(
-                    request.META.get(
-                        'HTTP_REFERER',
-                        'shop:product_list'
-                    )
-                )
+                
+                return JsonResponse({  
+                    "ok": False,
+                    "type": "error",
+                    "message": f"Only {product.stock} units of {product.name} are available."
+                })
         
         cart_item, created = UserCartItem.objects.get_or_create(
             cart = user_cart,
@@ -69,60 +59,79 @@ def add_to_cart(request, product_id):
         new_quantity = current_quantity + quantity
 
         if new_quantity > product.stock:
-            messages.error(
-                request,
-                f"Only {product.stock} units of {product.name} are available."
-            )
 
-            return redirect(
-                request.META.get(
-                    'HTTP_REFERER',
-                    'shop:product_list'
-                )
-            )
+            return JsonResponse({
+                    "ok": False,
+                    "type": "error",
+                    "message": f"Only {product.stock} units of {product.name} are available."
+                })
 
         cart.add(product_id, quantity)
-
-    messages.success(
-        request,
-        f"{product.name} added to cart ✓"
-    )
-
-    return redirect(request.META.get('HTTP_REFERER', 'shop:product_list'))
     
+    return JsonResponse({
+                    "ok": True,
+                    "type": "success",
+                    "message": f"{quantity}x  {product.name} added to cart ✓"
+                })
+
 
 
 def remove_from_cart(request, product_id):
 
+    product = Product.objects.filter(id=product_id).first()
+    product_name = product.name if product else "Item"
+
     if request.user.is_authenticated:
+
+        cart = DatabaseCart(request.user)
         
-        user_cart, created = UserCart.objects.get_or_create(
+        user_cart, _ = UserCart.objects.get_or_create(
             user = request.user
         )
 
-        item = get_object_or_404(
-            UserCartItem,
+        item = UserCartItem.objects.filter(
             cart = user_cart,
             product_id = product_id
-        )
+        ).first()
 
-        item.delete()
+        if item:
+            removed_qty = item.quantity
+            item.delete()
+        else:
+            removed_qty = 0
 
     else:
-
         cart = Cart(request)
+
+        removed_qty = cart.cart.get(str(product_id), {}).get("quantity", 0)
         cart.remove(product_id)
 
-    return redirect('cart:cart_detail')
+    return JsonResponse({
+                    "ok": True,
+                    "type": "success",
+                    "message": f"{product_name} removed from cart",
+                    "product_id": product_id,
+                    "removed_qty": removed_qty,
+                    "cart_count": len(cart),
+                    "cart_total": cart.get_total_price(),
+                })
+
 
 @require_POST
 def update_cart(request, product_id):
 
     quantity = int(request.POST.get('quantity'))
 
+    product = get_object_or_404(Product,id = product_id)
+
+    warning = None
+    deleted = False
+           
     if request.user.is_authenticated:
 
-        user_cart, created = UserCart.objects.get_or_create(
+        cart = DatabaseCart(request.user)
+
+        user_cart, _ = UserCart.objects.get_or_create(
             user = request.user
         )
 
@@ -132,48 +141,43 @@ def update_cart(request, product_id):
             product_id = product_id
         )
 
-        product = get_object_or_404(
-            Product,
-            id = product_id
-        )
-
         if quantity > product.stock:
 
-            item.quantity = product.stock
-            item.save()
+            quantity = product.stock
+            warning = f"Only {product.stock} units of {product.name} are available. Quantity adjusted."
 
-            messages.error(
-                request,
-                f"Only {product.stock} units of {product.name} are available. Quantity was adjusted."
-            )
-
-            return redirect ('cart:cart_detail')
-
+        deleted = False
+        
         if quantity <= 0:
             item.delete()
+            deleted = True
         else: 
             item.quantity = quantity
             item.save()
     else:
         
-        product = get_object_or_404(
-            Product,
-            id = product_id
-        )
+        cart = Cart(request)
 
         if quantity > product.stock:
-
-            messages.error(
-                request,
-                f"Only {product.stock} items available."
-            )
-
-            return redirect('cart:cart_details')
-
-        cart = Cart(request)
+            quantity = product.stock
+            warning = f"Only {product.stock} units of {product.name} are available. Quantity adjusted."
+           
+        if quantity <= 0:
+            item.delete()
+            deleted = True
+            
         cart.update(product_id, quantity)
 
-    return redirect('cart:cart_detail')
+    return JsonResponse({
+                    "ok": True,
+                    "deleted": deleted,
+                    "type": "warning" if warning else "success",
+                    "message": warning if warning else "Cart updated ✓",
+                    "adjusted_quantity": quantity,
+                    "item_total": float(product.price * quantity),
+                    "cart_total": float(cart.get_total_price()),
+                    "cart_count": len(cart),
+                })
 
 def check_compatibility(cart_items):
     
@@ -282,3 +286,14 @@ def cart_detail(request):
             'has_stock_problem': has_stock_problem
 
     })
+
+def cart_count(request):
+    if request.user.is_authenticated:
+        cart = DatabaseCart(request.user)
+    else:
+        cart = Cart(request)
+    return JsonResponse({
+        "count": len(cart)
+    })
+
+

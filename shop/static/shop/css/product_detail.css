@@ -11,3 +11,29 @@
 .star-rating span.hovered {
     color:gold;
 }
+
+.recommended-scroll {
+    display: flex;
+    overflow-x: auto;
+    padding: 10px 0;
+    scroll-snap-type: x mandatory;
+    gap: 16px;
+}
+
+.recommended-card {
+    width: 200px;
+    scroll-snap-align: start;
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+    border-radius: 8px;
+    overflow: visible;
+    position: relative;
+    z-index: 1;
+    flex-shrink: 0;
+}
+
+
+.recommended-card:hover {
+    transform: translateY(-6px);
+    z-index: 10;
+    box-shadow: 0 10px 25px rgba(0,0,0,0.15);
+}

@@ -23,7 +23,8 @@
 
         {% for item in cart %}
 
-        <div class="card mb-3 shadow-sm">
+        <div class="card mb-3 shadow-sm"
+            data-cart-item="{{ item.product.id }}">
             <div class="row g-0">
 
                 <div class="col-md-3">
@@ -74,7 +75,7 @@
                             Unit price: {{ item.price }} €
                         </p>
 
-                        <p class="fw-bold">
+                        <p class="fw-bold item-total">
                             Total: {{ item.total_price }} €
                         </p>
 
@@ -89,9 +90,10 @@
                                 name = "quantity"
                                 value = "{{ item.quantity }}"
                                 min = "0"
-                                class = "form-control form-control-sm"
+                                max="{{ item.product.stock }}"
+                                class = "form-control form-control-sm update-cart-input"
                                 style = "width: 80px;"
-                                onchange = "this.form.submit()">
+                                data-product-id="{{ item.product.id }}">
 
                             <small class="text-muted">Update qty</small>
                         </form>
@@ -102,9 +104,10 @@
                 <div class="col-md-3 d-flex align-items-center justify-content-center">
 
                     <button type="button"
-                            class="btn btn-outline-danger btn-sm"
+                            class="btn btn-outline-danger btn-sm remove-from-cart-btn"
                             data-bs-toggle="modal"
-                            data-bs-target="#removeModal{{ item.product.id }}">
+                            data-bs-target="#removeModal{{ item.product.id }}"
+                            data-product-id="{{ item.product.id }}">
                         Remove
                     </button>
                 
@@ -130,10 +133,12 @@
 
                     <div class="modal-footer">
                         <button class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
-                        <a href="{% url 'cart:remove_from_cart' item.product.id %}"
-                           class="btn btn-danger">
+                        <button type="button"
+                               class="btn btn-danger confirm-remove-btn"
+                               data-product-id="{{ item.product.id }}"
+                               data-bs-dismiss="modal">
                             Remove
-                        </a>
+                        </button>
                     </div>
 
                 </div>
@@ -160,12 +165,12 @@
 
             <p class="d-flex justify-content-between">
                 <span>Items:</span>
-                <strong>{{ cart|length }}</strong>
+                <strong id="cart-summary-count">{{ cart|length }}</strong>
             </p>
 
             <p class="d-flex justify-content-between">
                 <span>Total:</span>
-                <strong>{{ total_price }}</strong>
+                <strong id="cart-summary-total">{{ total_price }}</strong>
             </p>
 
             <hr>

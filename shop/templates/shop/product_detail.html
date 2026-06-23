@@ -123,10 +123,12 @@
                                         name="quantity"
                                         value="1"
                                         min="1"
-                                        class="form-control"
+                                        class="form-control qty-input"
                                         style="width:100px;">
                             
-                                <button class="btn btn-success">
+                                <button type="button"
+                                        class="btn btn-success add-to-cart-btn"
+                                        data-product-id = "{{ product.id }}">
                                     Add to cart
                                 </button>
 
@@ -218,9 +220,24 @@
                                                         </p>
 
                                                         <a href="{% url 'shop:product_detail' item.id %}"
-                                                           class="btn btn-outline-success btn-sm w-100">
+                                                           class="btn btn-outline-success btn-sm w-100 mb-2">
                                                             View Product
                                                         </a>
+
+                                                        <form action="{% url 'cart:add_to_cart' item.id %}"
+                                                              method="post">
+
+                                                            {% csrf_token %}
+
+                                                            <input type="hidden" name="quantity" value="1">
+
+                                                            <button type="button"
+                                                                    class="btn btn-outline-primary btn-sm w-100 add-to-cart-btn"
+                                                                    data-product-id = "{{ item.id }}">
+                                                                Add to cart
+                                                            </button>
+                                                            
+                                                        </form>
 
                                                     </div>
 
@@ -264,13 +281,12 @@
 
         <div class="card-body">
 
-            <div class="d-flex overflow-auto gap-3 pb-2">
+            <div class="d-flex overflow-auto gap-3 pb-2 recommended-scroll">
 
                 {% for item in recommended_products %}
 
-                    <div class="card flex-shrink-0 shadow-sm h-100"
-                        style="width: 200px;">
-                        
+                    <div class="card flex-shrink-0 shadow-sm h-100 recommended-card">
+
                         {% if item.image %}
                             <img src="{{ item.image.url }}"
                                 class="card-img-top"
@@ -287,16 +303,33 @@
                                 {{ item.price }} €
                             </p>
 
-                            <a href="{% url 'shop:product_detail' item.id %}"
-                            class="btn btn-outline-primary btn-sm mt-auto">
-                                View product
-                            </a>
+                            <form action="{% url 'cart:add_to_cart' item.id %}"
+                                  method="post"
+                                  class="mt-auto">
+
+                                {% csrf_token %}
+
+                                <input type="hidden" name="quantity" value="1">
+
+                                <a href="{% url 'shop:product_detail' item.id %}"
+                                   class="btn btn-outline-primary btn-sm w-100 mb-2">
+                                    View product
+                                </a>
+
+                                <button type="button"
+                                        class="btn btn-success btn-sm w-100 add-to-cart-btn"
+                                        data-product-id="{{ item.id }}">
+                                    Add to cart
+                                </button>
+                                
+                            </form>
 
                         </div>
 
                     </div>
 
                 {% endfor %}
+
             </div>
 
         </div>
