@@ -249,6 +249,8 @@ document.addEventListener("DOMContentLoaded", function() {
     });
 
     function showEmptyCartIfNeeded(cartCount) {
+        cartCount = parseInt(cartCount);
+        
         if(cartCount > 0) return;
 
         const cartItems = document.getElementById("cart-items");
@@ -276,7 +278,7 @@ document.addEventListener("DOMContentLoaded", function() {
                         badge.classList.remove("d-none");
                     }
                     else {
-                        classList.add("d-none");
+                        badge.classList.add("d-none");
                     }
                 }
             });
