@@ -52,25 +52,18 @@ document.addEventListener("DOMContentLoaded", function() {
 
         e.preventDefault();
         const quantityInput = form.querySelector("[name='quantity']");
-        const quantity = parseInt = parseInt(quantityInput.value);
+        const quantity = parseInt(quantityInput.value);
 
-        fetch(form.action, {
-            method: "POST",
-            headers: {
-                "X-CSRFToken": getCSRFToken()
-            },
-            body: new URLSearchParams({
-                quantity: quantity
-            })
-        })
-        .then(res => res.json())
-        .then(data => {
-            notify(data.type, data.message);
+        const productId = form.action.split("/cart/update/")[1].split("/")[0];
 
-            if (data.ok && classList.contains("stock-fix-form")) {
-                this.location.reload();
-            }
-        });
+        const visibleInput = document.querySelector(
+            `.update-cart-input[data-product-id="${productId}"]`
+        );
+
+        if (visibleInput) {
+            visibleInput.value = quantity;
+            visibleInput.dispatchEvent(new Event("change", { bubbles: true}));
+        }
     });
 
     document.addEventListener("click", function(e) {
@@ -259,6 +252,26 @@ document.addEventListener("DOMContentLoaded", function() {
                 }
 
                 const card = input.closest("[data-cart-item]");
+
+                if(card && data.adjusted_quantity <= parseInt(input.max)) {
+                        const warningBlock = card.querySelector(".stock-warning-block");
+                        if (warningBlock) {
+                            warningBlock.remove();
+                        }
+
+                        const anyStockWarningsLeft = document.querySelector(".stock-warning-block");
+                        if(!anyStockWarningsLeft) {
+                            const disabledBlock = document.getElementById("checkout-disabled-block");
+
+                            if (disabledBlock) {
+                                disabledBlock.innerHTML = `
+                                    <a href="/orders/checkout/" id="checkout-enabled-btn" class="btn btn-success btn-lg w-100 mb-2">
+                                        🛒 Proceed to Checkout
+                                    </a>
+                                `;
+                            }
+                        }
+                    }
 
                 if (card) {
                     const itemTotal = card.querySelector(".item-total");

@@ -182,7 +182,7 @@ def update_cart(request, product_id):
                     "ok": True,
                     "deleted": deleted,
                     "type": "warning" if warning else "success",
-                    "message": warning if warning else "Cart updated ✓",
+                    "message": warning if warning else "",
                     "product_name": product.name,
                     "adjusted_quantity": quantity,
                     "item_total": float(product.price * quantity),

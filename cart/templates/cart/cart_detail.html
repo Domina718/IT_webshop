@@ -50,26 +50,30 @@
                                     </a>
                                 {% if item.quantity > item.product.stock %}
 
-                                    <div class="alert alert-danger py-2">
-                                        Requested quantity is not available.
-                                        Available stock: {{ item.product.stock }}
+                                    <div class="stock-warning-block">
+
+                                        <div class="alert alert-danger py-2">
+                                            Requested quantity is not available.
+                                            Available stock: {{ item.product.stock }}
+                                        </div>
+
+                                        <form action="{% url 'cart:update_cart' item.product.id %}"
+                                            method="post"
+                                            class="mt-2 ajax-update-cart-form stock-fix-form">
+                                            
+                                            {% csrf_token %}
+
+                                            <input type="hidden"
+                                                name="quantity"
+                                                value="{{ item.product.stock }}">
+
+                                            <button type="submit" class="btn btn-warning btn-sm">
+                                                Set quantity to available stock
+                                            </button>
+                                            
+                                        </form>
+
                                     </div>
-
-                                    <form action="{% url 'cart:update_cart' item.product.id %}"
-                                        method="post"
-                                        class="mt-2 ajax-update-cart-form stock-fix-form">
-                                        
-                                        {% csrf_token %}
-
-                                        <input type="hidden"
-                                            name="quantity"
-                                            value="{{ item.product.stock }}">
-
-                                        <button type="submit" class="btn btn-warning btn-sm">
-                                            Set quantity to available stock
-                                        </button>
-                                        
-                                    </form>
                                     
                                 {% endif %}
 
@@ -181,15 +185,16 @@
 
                 {% if not has_stock_problem %}
 
-                    <a href="#" class="btn btn-success btn-lg w-100 mb-2">
+                    <a href="{% url 'orders:checkout' %}" id ="checkout-enabled-btn" class="btn btn-success btn-lg w-100 mb-2">
                         🛒 Proceed to Checkout
                     </a>
 
                 {% else %}
 
-                    <button class="btn btn-success" disabled> 🛒 Proceed to Checkout</button>
-                    <p class="text-danger mt-2">Please update your cart before checkout.</p>
-                
+                    <div id="checkout-disabled-block">
+                        <button class="btn btn-success" disabled> 🛒 Proceed to Checkout</button>
+                        <p class="text-danger mt-2">Please update your cart before checkout.</p>
+                    </div>
 
                 {% endif %}
 
