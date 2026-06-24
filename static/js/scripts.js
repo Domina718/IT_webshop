@@ -10,29 +10,10 @@ document.addEventListener("DOMContentLoaded", function() {
         new bootstrap.Toast(el).show();
     }
 
-
-    function showBanner(message) {
-        const el = document.getElementById("globalBanner");
-
-        if(!el) return;
-
-        el.innerText = message;
-        el.classList.remove("d-none");
-
-        setTimeout (() => {
-            el.classList.add("d-none");
-        }, 4000)
-    }
-
     function notify(type, message) {
         if (!message) return;
             
         showToast(message);
-        
-        if(type === "warning") {
-            showBanner(message);
-        }
-        
     }
 
     function updateCartBadge(delta = 1) {
@@ -308,10 +289,12 @@ document.addEventListener("DOMContentLoaded", function() {
         const input = e.target.closest(".update-cart-input");
         if (!input) return;
 
-        const max = parseInt(input.max)
+        const max = parseInt(input.max);
+        const value = parseInt(input.value);
+        const productName = input.dataset.productName;
         
-        if(parseInt(input.value) >= max){
-            notify("warning", `Only ${max} units available.`)
+        if(value >= max){
+            notify("warning", `Only ${max} units of ${productName} are available.`)
         }
     });
 

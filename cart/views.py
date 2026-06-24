@@ -294,7 +294,9 @@ def cart_detail(request):
             'cart': cart,
             'total_price': cart.get_total_price(),
             'compatibility_warnings': warnings,
-            'has_stock_problem': has_stock_problem
+            'has_stock_problem': has_stock_problem,
+            'original_total_price': cart.get_original_total_price(),
+            'total_savings': cart.get_total_savings()
 
     })
 

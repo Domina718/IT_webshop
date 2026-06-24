@@ -86,6 +86,15 @@ class Cart:
             for item in self
         )
     
+    def get_original_total_price(self):
+        return sum(
+            item['product'].price * item['quantity']
+            for item in self
+        )
+    
+    def get_total_savings(self):
+        return self.get_original_total_price() - self.get_total_price()
+    
 
     def clear(self):
         self.session['cart'] = {}
@@ -118,7 +127,7 @@ class DatabaseCart:
                 'original_price': float(item.product.price),
                 'has_discount': item.product.has_discount,
                 'discount_percent': item.product.discount_percent,
-                'total_price': float(item.product.price * item.quantity)
+                'total_price': float(item.product.discount_price * item.quantity)
             }
         
     def __len__(self):
@@ -134,6 +143,15 @@ class DatabaseCart:
             item.product.discount_price * item.quantity
             for item in self.user_cart.items.select_related('product')
         )
+    
+    def get_original_total_price(self):
+        return sum(
+            item.product.price * item.quantity
+            for item in self.user_cart.items.select_realted('product')
+        )
+    
+    def get_total_savings(self):
+        return self.get_original_total_price() - self.get_total_price()
     
     def clear(self):
         self.user_cart.items.all().delete()

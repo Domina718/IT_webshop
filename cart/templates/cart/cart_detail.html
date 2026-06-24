@@ -95,8 +95,7 @@
                                 </p>
 
                                 <p class="fw-bold item-total">
-                                    Total: {{ item.total_price|floatformat:2 }} €
-                                    
+                                    Total: {{ item.total_price|floatformat:2 }} €     
                                 </p>
 
                                 <form action="{% url 'cart:update_cart' item.product.id %}"
@@ -114,6 +113,7 @@
                                         class = "form-control form-control-sm update-cart-input"
                                         style = "width: 80px;"
                                         data-product-id="{{ item.product.id }}"
+                                        data-product-name="{{ item.product.name }}"
                                         data-current-quantity="{{ item.quantity }}">
 
                                     <small class="text-muted">Update qty</small>
@@ -190,9 +190,21 @@
                     <strong id="cart-summary-count">{{ cart|length }}</strong>
                 </p>
 
+                 {% if total_savings > 0 %}
+                    <p class="d-flex justify-content-between text-muted">
+                        <span>Subtotal:</span>
+                        <strong>{{ original_total_price|floatformat:2 }} €</strong>
+                    </p>
+
+                    <p class="d-flex justify-content-between text-danger">
+                        <span>You saved:</span>
+                        <strong>-{{ total_savings|floatformat:2 }} €</strong>
+                    </p>
+                {% endif %}
+
                 <p class="d-flex justify-content-between">
                     <span>Total:</span>
-                    <strong id="cart-summary-total">{{ total_price|floatformat:2 }}</strong>
+                    <strong id="cart-summary-total">{{ total_price|floatformat:2 }} €</strong>
                 </p>
 
                 <hr>
