@@ -18,68 +18,126 @@
                     placeholder="Search products...">
             </div>
 
-            <div class="col-md">
-                <select name="category" class="form-select mb-2">
-                    <option value="" {% if not category_id %}selected{% endif %}>
-                        All categories
-                    </option>
-
+            <div class="col-md-auto dropdown">
+                <button class="btn btn-outline-secondary dropdown-toggle w-100"
+                        type="button"
+                        data-bs-toggle="dropdown"
+                        data-bs-auto-close="outside">
+                    Category
+                </button>
+                <div class="dropdown-menu p-3" style="min-width: 220px;">
                     {% for category in categories %}
-                        <option value="{{ category.id}}"
-                            {% if category_id == category.id|stringformat:"s" %}
-                                selected
-                            {% endif %}
-                        >
-                            {{ category.name }}
-                        </option>
+                        <div class="form-check">
+                            <input class="form-check-input"
+                                    type="checkbox"
+                                    name="category"
+                                    value="{{ category.id }}"
+                                    id="cat-{{ category.id }}"
+                                    {% if category.id|stringformat:"s" in categories_selected %}checked{% endif %}>
+                            <label class="form-check-label d-block w-100" for="cat-{{ category.id }}">
+                                {{ category.name }}
+                            </label>
+                        </div>
                     {% endfor %}
-                </select>
+                </div>
             </div>
 
-            <div class="col-md">
-                <select name="brand" class="form-select mb-2">
-                    <option value="">All brands</option> 
+            <div class="col-md-auto dropdown">
+                <button class="btn btn-outline-secondary dropdown-toggle w-100"
+                        type="button"
+                        data-bs-toggle="dropdown"
+                        data-bs-auto-close="outside">
+                    Brand
+                </button>
+                <div class="dropdown-menu p-3" style="min-width: 220px;">
                     {% for item in brands %}
-                        <option value="{{ item }}" {% if brand == item %}selected{% endif %}>
-                            {{ item }}
-                        </option>
+                        <div class="form-check">
+                            <input class="form-check-input"
+                                    type="checkbox"
+                                    name="brand"
+                                    value="{{ item }}"
+                                    id="brand-{{ forloop.counter }}"
+                                    {% if item in brands_selected %}checked{% endif %}>
+                            <label class="form-check-label d-block w-100" for="brand-{{ forloop.counter}}">
+                                {{ item }}
+                            </label>
+                        </div>
                     {% endfor %}
-                </select>
+                </div>
             </div>
 
-            <div class="col-md">
-                <select name="socket" class="form-select mb-2">
-                    <option value="">All sockets</option>
+            <div class="col-md-auto dropdown">
+                <button class="btn btn-outline-secondary dropdown-toggle w-100"
+                        type="button"
+                        data-bs-toggle="dropdown"
+                        data-bs-auto-close="outside">
+                    Socket
+                </button>
+                <div class="dropdown-menu p-3" style="min-width: 220px;">
                     {% for item in sockets %}
-                        <option value="{{ item }}" {% if socket == item %}selected{% endif %}>
-                            {{ item }}
-                        </option>
+                        <div class="form-check">
+                            <input class="form-check-input"
+                                    type="checkbox"
+                                    name="socket"
+                                    value="{{ item }}"
+                                    id="socket-{{ forloop.counter }}"
+                                    {% if item in sockets_selected %}checked{% endif %}>
+                            <label class="form-check-label d-block w-100" for="socket-{{ forloop.counter}}">
+                                {{ item }}
+                            </label>
+                        </div>
                     {% endfor %}
-                </select>
+                </div>
             </div>
 
-            <div class="col-md">
-                <select name="ram_type" class="form-select mb-2">
-                    <option value="">All RAM types</option>
+            <div class="col-md-auto dropdown">
+                <button class="btn btn-outline-secondary dropdown-toggle w-100"
+                        type="button"
+                        data-bs-toggle="dropdown"
+                        data-bs-auto-close="outside">
+                    RAM
+                </button>
+                <div class="dropdown-menu p-3" style="min-width: 220px;">
                     {% for item in ram_types %}
-                        <option value="{{ item }}" {% if ram_type == item %}selected{% endif %}>
-                            {{ item }}
-                        </option>
+                        <div class="form-check">
+                            <input class="form-check-input"
+                                    type="checkbox"
+                                    name="ram_type"
+                                    value="{{ item }}"
+                                    id="ram-{{ forloop.counter }}"
+                                    {% if item in ram_types_selected %}checked{% endif %}>
+                            <label class="form-check-label d-block w-100" for="ram-{{ forloop.counter}}">
+                                {{ item }}
+                            </label>
+                        </div>
                     {% endfor %}
-                </select>
+                </div>
             </div>
 
-            <div class="col-md">
-                <select name="storage_type" class="form-select mb-2">
-                    <option value="">All Storage</option>
-                    {% for item in storage_types %}
-                        <option value="{{ item }}" {% if storage_type == item %}selected{% endif %}>
-                            {{ item }}
-                        </option>
+            <div class="col-md-auto dropdown">
+                <button class="btn btn-outline-secondary dropdown-toggle w-100"
+                        type="button"
+                        data-bs-toggle="dropdown"
+                        data-bs-auto-close="outside">
+                    Storage
+                </button>
+                <div class="dropdown-menu p-3" style="min-width: 220px;">
+                    {% for item in brands %}
+                        <div class="form-check">
+                            <input class="form-check-input"
+                                    type="checkbox"
+                                    name="storage_type"
+                                    value="{{ item }}"
+                                    id="storage-{{ forloop.counter }}"
+                                    {% if item in storage_types_selected %}checked{% endif %}>
+                            <label class="form-check-label d-block w-100" for="storage-{{ forloop.counter}}">
+                                {{ item }}
+                            </label>
+                        </div>
                     {% endfor %}
-                </select>
+                </div>
             </div>
-
+    
             <div class="col-md">
                 <input type="number"
                     name="min"

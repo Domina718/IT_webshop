@@ -13,13 +13,28 @@ def product_list(request):
     categories = Category.objects.all()
 
     query = request.GET.get('q', '')
-    category_id = request.GET.get('category', '')
+    categories_selected = [
+        category_id for category_id in request.GET.getlist('category')
+        if category_id.strip()
+    ]
     min_price = request.GET.get('min', '')
     max_price = request.GET.get('max', '')
-    brand = request.GET.get('brand', '')
-    socket = request.GET.get('socket', '')
-    ram_type = request.GET.get('ram_type', '')
-    storage_type = request.GET.get('storage_type', '')
+    brands_selected = [
+        item for item in request.GET.getlist('brand')
+        if item.strip()
+    ]
+    sockets_selected = [
+        item for item in request.GET.getlist('socket')
+        if item.strip()
+    ]
+    ram_types_selected = [
+        item for item in request.GET.getlist('ram_type')
+        if item.strip()
+    ]
+    storage_types_selected = [
+        item for item in request.GET.getlist('storage_type')
+        if item.strip()
+    ]
 
     if query:
         products = products.filter(
@@ -27,8 +42,8 @@ def product_list(request):
             Q(description__icontains = query)
         )
 
-    if category_id:
-        products = products.filter(category_id = category_id)
+    if categories_selected:
+        products = products.filter(category_id__in = categories_selected)
 
     if min_price and min_price.strip() != "":
         products = products.filter(price__gte=float(min_price))
@@ -36,17 +51,18 @@ def product_list(request):
     if max_price and max_price.strip() != "":
         products = products.filter(price__lte=float(max_price))
 
-    if brand:
-        products = products.filter(brand = brand)
+    if brands_selected:
+        products = products.filter(brand__in = brands_selected)
 
-    if socket:
-        products = products.filter(socket = socket)
+    if sockets_selected:
+        products = products.filter(socket__in = sockets_selected)
 
-    if ram_type:
-        products = products.filter(ram_type = ram_type)
+    if ram_types_selected:
+        products = products.filter(ram_type__in = ram_types_selected)
 
-    if storage_type:
-        products = products.filter(storage_type = storage_type)
+    if storage_types_selected:
+        products = products.filter(storage_type__in = storage_types_selected)
+
 
     brands = Product.objects.exclude(brand='').values_list('brand', flat=True).distinct()
     sockets = Product.objects.exclude(socket='').values_list('socket', flat=True).distinct()
@@ -67,17 +83,17 @@ def product_list(request):
         'products': products,
         'categories' : categories,
         'query' : query,
-        'category_id': category_id,
+        'categories_selected': categories_selected,
         'min_price': min_price,
         'max_price': max_price,
         'brands': brands,
         'sockets': sockets,
         'ram_types': ram_types,
         'storage_types': storage_types,
-        'brand': brand,
-        'socket': socket,
-        'ram_type': ram_type,
-        'storage_type': storage_type,
+        'brands_selected': brands_selected,
+        'sockets_selected': sockets_selected,
+        'ram_types_selected': ram_types_selected,
+        'storage_types_selected': storage_types_selected,
     })
 
 
