@@ -1,6 +1,7 @@
 from django.db import models
 from django.contrib.auth.models import User
 from django.core.validators import MinValueValidator, MaxValueValidator
+from decimal import Decimal
 
 class Category(models.Model):
     name = models.CharField(max_length = 100)
@@ -23,6 +24,14 @@ class Product(models.Model):
     price = models.DecimalField(
         max_digits = 10,
         decimal_places = 2
+    )
+
+    discount_percent = models.PositiveIntegerField(
+        default = 0,
+        validators = [
+            MinValueValidator(0),
+            MaxValueValidator(90)
+        ]
     )
 
     category = models.ForeignKey(
@@ -95,6 +104,16 @@ class Product(models.Model):
 
     def __str__(self):
         return self.name
+    
+    @property
+    def has_discount(self):
+        return self.discount_percent > 0
+    
+    @property
+    def discount_price(self):
+        if self.has_discount:
+            return self.price * Decimal(100 - self.discount_percent) / Decimal(100)
+        return self.price
     
 class Review(models.Model):
     product = models.ForeignKey(

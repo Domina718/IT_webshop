@@ -65,9 +65,25 @@
 
                     {% endif %}
 
-                    <h3 class="mt-3">
-                        {{ product.price }} €
-                    </h3>
+                    {% if product.has_discount %}
+                        <div class="mt-3">
+                            <span class="badge bg-danger fs-6">
+                                -{{ product.discount_percent }}%  
+                            </span>
+
+                            <div>
+                                <small class="text-muted text-decoration-line-through fs-5">
+                                    {{ product.price }} €
+                                </small>
+                            </div>
+
+                            <h3 class="text-danger fw-bold mb-0">
+                                {{ product.discount_price|floatformat:2 }} €
+                            </h3>
+                        </div>
+                    {% else %}
+                       <h3 class="mt-3">{{ product.price }} €</h3>
+                    {% endif %}
 
                     <p>
                         {{ product.description }}
@@ -82,7 +98,7 @@
                     {% endif %}
 
                     {% if product.ram_type %}
-                        <p><b>RAM type:</b>{{ product.ram_type }}</p>
+                        <p><b>RAM type:</b> {{ product.ram_type }}</p>
                     {% endif %}
 
                     {% if product.storage_type %}
@@ -247,9 +263,25 @@
                                                             </span>
                                                         {% endif %}
 
-                                                        <p class="fw-bold text-success mb-2">
-                                                            {{ item.price }} €
-                                                        </p>
+                                                        {% if item.has_discount %}
+                                                            <div class="mb-2">
+                                                                <span class="badge bg-danger">
+                                                                    -{{ item.discount_percent }}%  
+                                                                </span>
+
+                                                                <div>
+                                                                    <small class="text-muted text-decoration-line-through">
+                                                                        {{ item.price }} €
+                                                                    </small>
+                                                                </div>
+
+                                                                <div class="text-danger fw-bold">
+                                                                    {{ item.discount_price|floatformat:2 }} €
+                                                                </div>
+                                                            </div>
+                                                        {% else %}
+                                                            <p class="fw-bold text-success mb-2">{{ item.price }} €</p>
+                                                        {% endif %}
 
                                                         <a href="{% url 'shop:product_detail' item.id %}"
                                                            class="btn btn-outline-success btn-sm w-100 mb-2">
@@ -331,9 +363,25 @@
                                 {{ item.name }}
                             </h6>
 
-                            <p class="text-success fw-bold mb-2">
-                                {{ item.price }} €
-                            </p>
+                            {% if item.has_discount %}
+                                <div class="mb-2">
+                                    <span class="badge bg-danger">
+                                        -{{ item.discount_percent }}%  
+                                    </span>
+
+                                    <div>
+                                        <small class="text-muted text-decoration-line-through">
+                                            {{ item.price }} €
+                                        </small>
+                                    </div>
+
+                                    <div class="text-danger fw-bold">
+                                        {{ item.discount_price|floatformat:2 }} €
+                                    </div>
+                                </div>
+                            {% else %}
+                                <p class="fw-bold text-success mb-2">{{ item.price }} €</p>
+                            {% endif %}
 
                             <form action="{% url 'cart:add_to_cart' item.id %}"
                                   method="post"

@@ -26,6 +26,7 @@ class ProductAdmin(admin.ModelAdmin):
         'brand',
         'category',
         'price',
+        'discount_percent',
         'stock',
         'socket',
         'ram_type',
@@ -39,6 +40,7 @@ class ProductAdmin(admin.ModelAdmin):
         'ram_type',
         'storage_type',
         'nvme_support',
+        'discount_percent',
     )
 
     search_fields = (

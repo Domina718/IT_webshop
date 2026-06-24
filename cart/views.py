@@ -173,10 +173,10 @@ def update_cart(request, product_id):
             warning = f"Only {product.stock} units of {product.name} are available. Quantity adjusted."
            
         if quantity <= 0:
-            item.delete()
+            cart.remove(product_id)
             deleted = True
-
-        cart.update(product_id, quantity)
+        else:
+            cart.update(product_id, quantity)
 
     return JsonResponse({
                     "ok": True,
@@ -185,7 +185,7 @@ def update_cart(request, product_id):
                     "message": warning if warning else "",
                     "product_name": product.name,
                     "adjusted_quantity": quantity,
-                    "item_total": float(product.price * quantity),
+                    "item_total": float(product.discount_price * quantity),
                     "cart_total": float(cart.get_total_price()),
                     "cart_count": len(cart),
                 })

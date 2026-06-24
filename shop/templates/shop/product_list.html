@@ -122,7 +122,7 @@
                     Storage
                 </button>
                 <div class="dropdown-menu p-3" style="min-width: 220px;">
-                    {% for item in brands %}
+                    {% for item in storage_types %}
                         <div class="form-check">
                             <input class="form-check-input"
                                     type="checkbox"
@@ -179,44 +179,44 @@
 
             {% for category in categories %}
                 {% if category.id in categories_selected %}
-                    <span class="badge bg-secondary fs-6 py-2 px-3">
+                    <span class="badge rounded-pill bg-primary fs-6 py-2 px-3">
                         Category: {{ category.name }}
                     </span>
                 {% endif %}
             {% endfor %}
 
             {% for item in brands_selected %}
-                <span class="badge bg-secondary fs-6 py-2 px-3">
+                <span class="badge rounded-pill bg-primary fs-6 py-2 px-3">
                     Brand: {{ item }}
                 </span>
             {% endfor %}
 
             {% for item in sockets_selected %}
-                <span class="badge bg-secondary fs-6 py-2 px-3">
+                <span class="badge rounded-pill bg-primary fs-6 py-2 px-3">
                     Socket: {{ item }}
                 </span>
             {% endfor %}
 
             {% for item in ram_types_selected %}
-                <span class="badge bg-secondary fs-6 py-2 px-3">
+                <span class="badge rounded-pill bg-primary fs-6 py-2 px-3">
                     RAM: {{ item }}
                 </span>
             {% endfor %}
 
             {% for item in storage_types_selected %}
-                <span class="badge bg-secondary fs-6 py-2 px-3">
+                <span class="badge rounded-pill bg-primary fs-6 py-2 px-3">
                     Storage: {{ item }}
                 </span>
             {% endfor %}
 
             {% if min_price %}
-                <span class="badge bg-secondary fs-6 py-2 px-3">
+                <span class="badge rounded-pill bg-primary fs-6 py-2 px-3">
                     Min: {{ min_price }} €
                 </span>
             {% endif %}
 
             {% if max_price %}
-                <span class="badge bg-secondary fs-6 py-2 px-3">
+                <span class="badge rounded-pill bg-primary fs-6 py-2 px-3">
                     Max: {{ max_price }} €
                 </span>
             {% endif %}
@@ -297,7 +297,25 @@
                         {% endif %}
                     </div>
 
-                    <p class="fw-bold mb-2">{{ product.price }} €</p>
+                    {% if product.has_discount %}
+                        <div class="mb-2">
+                            <span class="badge bg-danger">
+                                -{{ product.discount_percent }}%  
+                            </span>
+
+                            <div>
+                                <small class="text-muted text-decoration-line-through">
+                                    {{ product.price }} €
+                                </small>
+                            </div>
+
+                            <div class="fw-bold mb-2">
+                                {{ product.discount_price|floatformat:2 }} €
+                            </div>
+                        </div>
+                    {% else %}
+                       <p class="fw-bold mb-2">{{ product.price }} €</p>
+                    {% endif %}
 
                     <div class="mt-auto d-flex justify-content-between align-items-center">
                         <form action="{% url 'cart:add_to_cart' product.id %}" method="post">

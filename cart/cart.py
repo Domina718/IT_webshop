@@ -56,27 +56,33 @@ class Cart:
 
     def get_price(self, product_id):
         product = Product.objects.get(id = product_id)
-        return product.price
+        return product.discount_price
     
 
     def __iter__(self):
         product_ids = self.cart.keys()
         products = Product.objects.filter(id__in=product_ids)
 
-        cart = self.cart.copy()
+        cart = {
+            product_id: item.copy()
+            for product_id, item in self.cart.items()
+        }
 
         for product in products:
             cart[str(product.id)]['product'] = product
 
         for item in cart.values():
-            item['price'] = float(item['price'])
+            item['price'] = float(item['product'].discount_price)
+            item['original_price'] = float(item['product'].price)
+            item['has_discount'] = item['product'].has_discount
+            item['discount_percent'] = item['product'].discount_percent
             item['total_price'] = item['price'] * item['quantity']
             yield item
 
 
     def get_total_price(self):
         return sum(
-            item['product'].price * item['quantity']
+            item['product'].discount_price * item['quantity']
             for item in self
         )
     
@@ -108,7 +114,10 @@ class DatabaseCart:
             yield {
                 'product': item.product,
                 'quantity': item.quantity,
-                'price': float(item.product.price),
+                'price': float(item.product.discount_price),
+                'original_price': float(item.product.price),
+                'has_discount': item.product.has_discount,
+                'discount_percent': item.product.discount_percent,
                 'total_price': float(item.product.price * item.quantity)
             }
         
@@ -122,7 +131,7 @@ class DatabaseCart:
     def get_total_price(self):
 
         return sum(
-            item.product.price * item.quantity
+            item.product.discount_price * item.quantity
             for item in self.user_cart.items.select_related('product')
         )
     

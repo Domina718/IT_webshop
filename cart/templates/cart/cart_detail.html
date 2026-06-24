@@ -78,11 +78,25 @@
                                 {% endif %}
 
                                 <p class="mb-1 text-muted">
-                                    Unit price: {{ item.price }} €
+                                    Unit price: 
+                                    {% if item.has_discount %}
+                                        <span class="text-muted text-decoration-line-through">
+                                            {{ item.original_price|floatformat:2 }} €
+                                        </span>
+                                        <span class="text-danger fw-bold ms-2">
+                                            {{ item.price|floatformat:2 }} €
+                                        </span>
+                                        <span class="badge bg-danger ms-1">
+                                            -{{ item.discount_percent }}%  
+                                        </span>
+                                    {% else %}
+                                        {{ item.price|floatformat:2 }} €
+                                    {% endif %}
                                 </p>
 
                                 <p class="fw-bold item-total">
-                                    Total: {{ item.total_price }} €
+                                    Total: {{ item.total_price|floatformat:2 }} €
+                                    
                                 </p>
 
                                 <form action="{% url 'cart:update_cart' item.product.id %}"
@@ -178,7 +192,7 @@
 
                 <p class="d-flex justify-content-between">
                     <span>Total:</span>
-                    <strong id="cart-summary-total">{{ total_price }}</strong>
+                    <strong id="cart-summary-total">{{ total_price|floatformat:2 }}</strong>
                 </p>
 
                 <hr>
