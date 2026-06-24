@@ -188,6 +188,11 @@ def update_cart(request, product_id):
                     "item_total": float(product.discount_price * quantity),
                     "cart_total": float(cart.get_total_price()),
                     "cart_count": len(cart),
+                    "original_item_total":float(product.price * quantity),
+                    "has_discount": product.has_discount,
+                    "discount_percent": product.discount_percent,
+                    "original_cart_total": float(cart.get_original_total_price()),
+                    "total_savings": float(cart.get_total_savings()),
                 })
 
 def check_compatibility(cart_items):

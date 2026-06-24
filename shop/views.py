@@ -4,6 +4,7 @@ from .models import Product, Category, Review
 from compatibility.models import CompatibilityRule
 from .forms import ReviewForm
 from .models import Product
+from orders.models import OrderItem
 
 
 def product_list(request):
@@ -112,11 +113,18 @@ def product_detail(request, pk):
 
         if not request.user.is_authenticated:
             return redirect('login')
+        
+        can_review = OrderItem.objects.filter(
+            order__user = request.user,
+            product = product
+        ).exists()
+
+        if not can_review:
+            return redirect('shop:product_detail, pk = product.pk')
 
         form = ReviewForm(request.POST)
 
         if form.is_valid():
-
 
             Review.objects.update_or_create(
                 product = product,
@@ -125,7 +133,7 @@ def product_detail(request, pk):
                     'rating' : form.cleaned_data['rating'],
                     'comment' : form.cleaned_data['comment'],
                 }
-           )
+            )
 
             return redirect('shop:product_detail', pk = product.pk)
 
@@ -224,6 +232,13 @@ def product_detail(request, pk):
 
     user_review = None
     form = None
+    can_review = False
+
+    if request.user.is_authenticated:
+        can_review = OrderItem.objects.filter(
+            order__user = request.user,
+            product = product
+        ).exists()
 
     if request.user.is_authenticated:
         user_review = Review.objects.filter(
@@ -244,6 +259,7 @@ def product_detail(request, pk):
         'user_review': user_review,
         'compatibility_groups': compatibility_groups,
         'recommended_products': recommended_products,
+        'can_review': can_review,
     })
 
 def home(request):

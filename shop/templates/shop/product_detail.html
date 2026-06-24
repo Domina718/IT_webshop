@@ -498,116 +498,116 @@
 
 <hr class="my-5">
 
-<div class="card shadow-sm">
+    <div class="card shadow-sm">
 
-    <div class="card-body">
+        <div class="card-body">
+            
+            {% if user.is_authenticated and can_review %}
 
-        {% if user_review %}
+                {% if user_review %}
 
-            <div id="review-display">
+                    <div id="review-display">
 
-                <h5>Your review</h5>
+                        <h5>Your review</h5>
 
-                <div class="border rounded p-3 mb-3">
+                        <div class="border rounded p-3 mb-3">
 
-                    <div class="mb-2">
+                            <div class="mb-2">
+                                {% include 'shop/components/rating_stars.html' with rating=user_review.rating %}
+                                <small class="text-muted">{{ user_review.rating }}/5</small>
+                            </div>
 
-                        {% include 'shop/components/rating_stars.html' with rating=user_review.rating %}
+                            {% if user_review.comment %}
+                                <p class="mb-2">{{ user_review.comment }}</p>                        
+                            {% else %}
+                                <p class="mb-1 text-muted fst-italic">No comment added.</p>
+                            {% endif %}
 
-                        <small class="text-muted">{{ user_review.rating }}/5</small>
+                            <small class="text-muted">
+                                Updated: {{ user_review.updated|date:"d.m.Y H:i" }}
+                            </small>
+
+                            <br>
+                            
+                            <button 
+                                type="button"
+                                id="edit-review-btn"
+                                class="btn btn-outline-primary mt-2">
+                                Edit review
+                            </button>
+
+                        </div>
 
                     </div>
 
-                    {% if user_review.comment %}
-
-                        <p class="mb-2">{{ user_review.comment }}</p>
-                    
-                    {% else %}
-
-                        <p class="mb-1 text-muted fst-italic">No comment added.</p>
-
-                    {% endif %}
-
-                    {% if user_review.created == user_review.updated %}
-
-                        <small class="text-muted">
-                            Created: {{ user_review.created|date:"d.m.Y H:i" }}
-                        </small>
-                    
-                    {% else %}
-
-                        <small class="text-muted">
-                            Updated: {{ user_review.updated|date:"d.m.Y H:i" }}
-                        </small>
-
-                    {% endif %}
-
-                    <br>
-                    
-                    <button 
-                        type="button"
-                        id="edit-review-btn"
-                        class="btn btn-outline-primary mt-2">
-                        Edit review
-                    </button>
-
-                </div>
-
-            </div>
-
-        {% endif %}
-
-        <div id="review-form-container" {% if user_review %}style="display:none;"{% endif %}>
-
-            <h5>
-                {% if user_review %}
-                    Edit review
-                {% else %}
-                    Write a review
                 {% endif %}
-            </h5>
 
-            <form method="post" class="review-form">
+                <div id="review-form-container" {% if user_review %}style="display:none;"{% endif %}>
 
-                {% csrf_token %}
+                    <h5>
+                        {% if user_review %}
+                            Edit review
+                        {% else %}
+                            Write a review
+                        {% endif %}
+                    </h5>
 
-                <div class="star-rating mb-2">
-                    <span data-value="1">★</span>
-                    <span data-value="2">★</span>
-                    <span data-value="3">★</span>
-                    <span data-value="4">★</span>
-                    <span data-value="5">★</span>
-                </div>
+                    <form method="post" class="review-form">
 
-                {{ form.rating }}
+                        {% csrf_token %}
 
-                <div class="mb-3">
+                        <div class="star-rating mb-2">
+                            <span data-value="1">★</span>
+                            <span data-value="2">★</span>
+                            <span data-value="3">★</span>
+                            <span data-value="4">★</span>
+                            <span data-value="5">★</span>
+                        </div>
 
-                    <label class="form-label">
-                        Comment
-                    </label>
+                        {{ form.rating }}
 
-                    <textarea
-                        name="comment"
-                        class="form-control"
-                        rows="3"
-                        placeholder="Write your review..."
-                    >{{ form.comment.value|default:'' }}</textarea>
-                    
+                        <div class="mb-3">
 
-                </div>
+                            <label class="form-label">
+                                Comment
+                            </label>
 
-                <button class="btn btn-success">
-                    Save review
-                </button>
+                            <textarea
+                                name="comment"
+                                class="form-control"
+                                rows="3"
+                                placeholder="Write your review..."
+                            >{{ form.comment.value|default:'' }}</textarea>
+                            
 
-            </form>   
+                        </div>
 
+                        <button class="btn btn-success">
+                            Save review
+                        </button>
+
+                    </form>   
+
+                 </div>
+        
+            {% elif user.is_authenticated %}
+
+                <p class="text-muted">
+                    You can write a review after purchasing this product.
+                </p>
+
+            {% else %}
+
+                <p class="text-muted">
+                    Please log in and purchase this product to write a review.
+                </p>
+
+            {% endif %}
+       
         </div>
 
     </div>
 
-</div>
 
 <link rel="stylesheet" href="{% static 'shop/css/product_detail.css' %}">
 

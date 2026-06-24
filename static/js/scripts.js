@@ -258,14 +258,38 @@ document.addEventListener("DOMContentLoaded", function() {
                     const itemTotal = card.querySelector(".item-total");
 
                     if (itemTotal) {
-                        itemTotal.innerText = 
-                        `Total: ${data.item_total} €`;
+                        if(data.has_discount) {
+                            itemTotal.innerHTML = `
+                            Total:
+                            <span class="text-muted text-decoration-line-through">
+                                ${data.original_item_total.toFixed(2)} €
+                            </span>
+                            <span class="text-danger fw-bold ms-2">
+                                ${data.item_total.toFixed(2)} €
+                            </span>
+                            <span class="badge bg-danger ms-1">
+                                -${data.discount_percent}%
+                            </span>`;
+                        }
+                        else{
+                            itemTotal.innerText = `Total: ${data.item_total.toFixed(2)} €`;
+                        }
                     }
                 }
 
                 const summaryTotal= document.getElementById("cart-summary-total");
                 if (summaryTotal) {
                     summaryTotal.innerText = `${data.cart_total} €`;
+                }
+
+                const summarySubtotal = document.getElementById("cart-summary-subtotal");
+                if(summarySubtotal && data.original_cart_total !== undefined) {
+                    summarySubtotal.innerText = `${data.original_cart_total.toFixed(2)} €`;
+                }
+
+                const summarySavings = document.getElementById("cart-summary-savings");
+                if(summarySavings && data.total_savings !== undefined) {
+                    summarySavings.innerText = `-${data.total_savings.toFixed(2)} €`;
                 }
 
                 const badge = document.getElementById("cart-count");

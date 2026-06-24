@@ -95,7 +95,7 @@
                                 </p>
 
                                 <p class="fw-bold item-total">
-                                    Total: {{ item.total_price|floatformat:2 }} €     
+                                    Item total: {{ item.total_price|floatformat:2 }} €     
                                 </p>
 
                                 <form action="{% url 'cart:update_cart' item.product.id %}"
@@ -193,12 +193,12 @@
                  {% if total_savings > 0 %}
                     <p class="d-flex justify-content-between text-muted">
                         <span>Subtotal:</span>
-                        <strong>{{ original_total_price|floatformat:2 }} €</strong>
+                        <strong id="cart-summary-subtotal">{{ original_total_price|floatformat:2 }} €</strong>
                     </p>
 
                     <p class="d-flex justify-content-between text-danger">
                         <span>You saved:</span>
-                        <strong>-{{ total_savings|floatformat:2 }} €</strong>
+                        <strong id="cart-summary-savings">-{{ total_savings|floatformat:2 }} €</strong>
                     </p>
                 {% endif %}
 
