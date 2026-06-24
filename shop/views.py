@@ -14,7 +14,8 @@ def product_list(request):
 
     query = request.GET.get('q', '')
     categories_selected = [
-        category_id for category_id in request.GET.getlist('category')
+        int(category_id)
+        for category_id in request.GET.getlist('category')
         if category_id.strip()
     ]
     min_price = request.GET.get('min', '')

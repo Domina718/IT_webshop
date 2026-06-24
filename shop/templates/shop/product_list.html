@@ -33,7 +33,7 @@
                                     name="category"
                                     value="{{ category.id }}"
                                     id="cat-{{ category.id }}"
-                                    {% if category.id|stringformat:"s" in categories_selected %}checked{% endif %}>
+                                    {% if category.id in categories_selected %}checked{% endif %}>
                             <label class="form-check-label d-block w-100" for="cat-{{ category.id }}">
                                 {{ category.name }}
                             </label>
@@ -165,6 +165,70 @@
         
     </form>
 
+    {% if categories_selected or brands_selected or sockets_selected or ram_types_selected or storage_types_selected %}
+
+        <div class="mb-3 d-flex flex-wrap gap-2 align-items-center">
+
+            <span class="text-muted me-2">Active filters</span>
+
+            {% if query %}
+                <span class="badge bg-primary fs-6 py-2 px-3">
+                    Search: {{ query }}
+                </span>
+            {% endif %}
+
+            {% for category in categories %}
+                {% if category.id in categories_selected %}
+                    <span class="badge bg-secondary fs-6 py-2 px-3">
+                        Category: {{ category.name }}
+                    </span>
+                {% endif %}
+            {% endfor %}
+
+            {% for item in brands_selected %}
+                <span class="badge bg-secondary fs-6 py-2 px-3">
+                    Brand: {{ item }}
+                </span>
+            {% endfor %}
+
+            {% for item in sockets_selected %}
+                <span class="badge bg-secondary fs-6 py-2 px-3">
+                    Socket: {{ item }}
+                </span>
+            {% endfor %}
+
+            {% for item in ram_types_selected %}
+                <span class="badge bg-secondary fs-6 py-2 px-3">
+                    RAM: {{ item }}
+                </span>
+            {% endfor %}
+
+            {% for item in storage_types_selected %}
+                <span class="badge bg-secondary fs-6 py-2 px-3">
+                    Storage: {{ item }}
+                </span>
+            {% endfor %}
+
+            {% if min_price %}
+                <span class="badge bg-secondary fs-6 py-2 px-3">
+                    Min: {{ min_price }} €
+                </span>
+            {% endif %}
+
+            {% if max_price %}
+                <span class="badge bg-secondary fs-6 py-2 px-3">
+                    Max: {{ max_price }} €
+                </span>
+            {% endif %}
+
+            <a href="{% url 'shop:product_list' %}"
+               class="btn btn-sm btn-outline-danger ms-2">
+                Clear all
+            </a>
+
+        </div>
+
+    {% endif%}
 
     {% for product in products %}
 
