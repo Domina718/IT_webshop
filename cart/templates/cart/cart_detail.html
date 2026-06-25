@@ -191,15 +191,17 @@
                 </p>
 
                  {% if total_savings > 0 %}
-                    <p class="d-flex justify-content-between text-muted">
-                        <span>Subtotal:</span>
-                        <strong id="cart-summary-subtotal">{{ original_total_price|floatformat:2 }} €</strong>
-                    </p>
+                    <div id="discount-summary-block">
+                        <p class="d-flex justify-content-between text-muted">
+                            <span>Subtotal:</span>
+                            <strong id="cart-summary-subtotal">{{ original_total_price|floatformat:2 }} €</strong>
+                        </p>
 
-                    <p class="d-flex justify-content-between text-danger">
-                        <span>You saved:</span>
-                        <strong id="cart-summary-savings">-{{ total_savings|floatformat:2 }} €</strong>
-                    </p>
+                        <p class="d-flex justify-content-between text-danger">
+                            <span>You saved:</span>
+                            <strong id="cart-summary-savings">-{{ total_savings|floatformat:2 }} €</strong>
+                        </p>
+                    </div>
                 {% endif %}
 
                 <p class="d-flex justify-content-between">

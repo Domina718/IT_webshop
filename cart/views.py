@@ -124,6 +124,8 @@ def remove_from_cart(request, product_id):
                     "removed_qty": removed_qty,
                     "cart_count": len(cart),
                     "cart_total": cart.get_total_price(),
+                    "original_cart_total": float(cart.get_original_total_price()),
+                    "total_savings": float(cart.get_total_savings()),
                 })
 
 

@@ -147,7 +147,7 @@ class DatabaseCart:
     def get_original_total_price(self):
         return sum(
             item.product.price * item.quantity
-            for item in self.user_cart.items.select_realted('product')
+            for item in self.user_cart.items.select_related('product')
         )
     
     def get_total_savings(self):

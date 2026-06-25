@@ -120,15 +120,28 @@ document.addEventListener("DOMContentLoaded", function() {
                 }
 
                 const summaryCount = document.getElementById("cart-summary-count");
-
                 if(summaryCount) {
                     summaryCount.innerText = data.cart_count;
                 }
 
                 const summaryTotal= document.getElementById("cart-summary-total");
-
                 if (summaryTotal) {
                     summaryTotal.innerText = `${data.cart_total} €`;
+                }
+
+                const summarySubtotal = document.getElementById("cart-summary-subtotal");
+                if(summarySubtotal && data.original_cart_total !== undefined) {
+                    summarySubtotal.innerText = `${data.original_cart_total.toFixed(2)} €`;
+                }
+
+                const summarySavings = document.getElementById("cart-summary-savings");
+                if(summarySavings && data.total_savings !== undefined) {
+                    summarySavings.innerText = `-${data.total_savings.toFixed(2)} €`;
+                }
+
+                const discountBlock = document.getElementById("discount-summary-block");
+                if (discountBlock && data.total_savings !== undefined && data.total_savings <= 0) {
+                    discountBlock.remove();
                 }
 
                 showEmptyCartIfNeeded(data.cart_count);
@@ -145,6 +158,87 @@ document.addEventListener("DOMContentLoaded", function() {
             }
         });
     });
+
+    function updateCartSummary(data) {
+        const summaryTotal= document.getElementById("cart-summary-total");
+        if (summaryTotal) {
+            summaryTotal.innerText = `${data.cart_total} €`;
+        }
+
+        const summarySubtotal = document.getElementById("cart-summary-subtotal");
+        if(summarySubtotal && data.original_cart_total !== undefined) {
+            summarySubtotal.innerText = `${data.original_cart_total.toFixed(2)} €`;
+        }
+
+        const summarySavings = document.getElementById("cart-summary-savings");
+        if(summarySavings && data.total_savings !== undefined) {
+            summarySavings.innerText = `-${data.total_savings.toFixed(2)} €`;
+        }
+
+        const discountBlock = document.getElementById("discount-summary-block");
+        if (discountBlock && data.total_savings !== undefined && data.total_savings <= 0) {
+            discountBlock.remove();
+        }
+
+        const badge = document.getElementById("cart-count");
+        if (badge && data.cart_count !== undefined) {
+            badge.innerText = data.cart_count;
+        }
+
+        const summaryCount = document.getElementById("cart-summary-count");
+        if(summaryCount && data.cart_count !== undefined) {
+            summaryCount.innerText = data.cart_count;
+        }
+
+        if(typeof UpdateMiniCart === "function") {
+            UpdateMiniCart();
+        }
+    }
+
+    function updateItemTotal(card, data) {
+        const itemTotal = card?.querySelector(".item-total");
+        if (!itemTotal) return;
+
+        if(data.has_discount) {
+            itemTotal.innerHTML = `
+            Total:
+            <span class="text-muted text-decoration-line-through">
+                ${data.original_item_total.toFixed(2)} €
+            </span>
+            <span class="text-danger fw-bold ms-2">
+                ${data.item_total.toFixed(2)} €
+            </span>
+            <span class="badge bg-danger ms-1">
+                -${data.discount_percent}%
+            </span>`;
+        }
+        else{
+            itemTotal.innerText = `Total: ${data.item_total.toFixed(2)} €`;
+        }
+    }
+
+    function removeStockWarningIfFixed(card, input, data) {
+        if(card && data.adjusted_quantity <= parseInt(input.max)) {
+            const warningBlock = card.querySelector(".stock-warning-block");
+            if (warningBlock) {
+                warningBlock.remove();
+            }
+
+            const anyStockWarningsLeft = document.querySelector(".stock-warning-block");
+            if(!anyStockWarningsLeft) {
+                const disabledBlock = document.getElementById("checkout-disabled-block");
+
+                if (disabledBlock) {
+                    disabledBlock.innerHTML = `
+                        <a href="/orders/checkout/" id="checkout-enabled-btn" class="btn btn-success btn-lg w-100 mb-2">
+                            🛒 Proceed to Checkout
+                        </a>
+                    `;
+                }
+            }
+        }
+
+    }
 
     document.addEventListener("change", function(e) {
         const input = e.target.closest(".update-cart-input");
@@ -203,110 +297,13 @@ document.addEventListener("DOMContentLoaded", function() {
             if (data.ok) {
                 input.dataset.currentQuantity = data.adjusted_quantity;
 
-                if(data.deleted){
-
-                    const card = input.closest("[data-cart-item]");
-
-                    if(card) {
-                        card.remove();
-                    }
-
-                    const badge = document.getElementById("cart-count");
-                    if (badge) {
-                        badge.innerText = data.cart_count;
-                    }
-
-                    const summaryCount = document.getElementById("cart-summary-count");
-                    if(summaryCount) {
-                        summaryCount.innerText = data.cart_count;
-                    }
-
-                    const summaryTotal= document.getElementById("cart-summary-total");
-                    if (summaryTotal) {
-                        summaryTotal.innerText = `${data.cart_total} €`;
-                    }
-
-                    if(typeof UpdateMiniCart === "function") {
-                        UpdateMiniCart();
-                    }
-                    return;
-                }
-
                 const card = input.closest("[data-cart-item]");
 
-                if(card && data.adjusted_quantity <= parseInt(input.max)) {
-                        const warningBlock = card.querySelector(".stock-warning-block");
-                        if (warningBlock) {
-                            warningBlock.remove();
-                        }
-
-                        const anyStockWarningsLeft = document.querySelector(".stock-warning-block");
-                        if(!anyStockWarningsLeft) {
-                            const disabledBlock = document.getElementById("checkout-disabled-block");
-
-                            if (disabledBlock) {
-                                disabledBlock.innerHTML = `
-                                    <a href="/orders/checkout/" id="checkout-enabled-btn" class="btn btn-success btn-lg w-100 mb-2">
-                                        🛒 Proceed to Checkout
-                                    </a>
-                                `;
-                            }
-                        }
-                    }
-
-                if (card) {
-                    const itemTotal = card.querySelector(".item-total");
-
-                    if (itemTotal) {
-                        if(data.has_discount) {
-                            itemTotal.innerHTML = `
-                            Total:
-                            <span class="text-muted text-decoration-line-through">
-                                ${data.original_item_total.toFixed(2)} €
-                            </span>
-                            <span class="text-danger fw-bold ms-2">
-                                ${data.item_total.toFixed(2)} €
-                            </span>
-                            <span class="badge bg-danger ms-1">
-                                -${data.discount_percent}%
-                            </span>`;
-                        }
-                        else{
-                            itemTotal.innerText = `Total: ${data.item_total.toFixed(2)} €`;
-                        }
-                    }
-                }
-
-                const summaryTotal= document.getElementById("cart-summary-total");
-                if (summaryTotal) {
-                    summaryTotal.innerText = `${data.cart_total} €`;
-                }
-
-                const summarySubtotal = document.getElementById("cart-summary-subtotal");
-                if(summarySubtotal && data.original_cart_total !== undefined) {
-                    summarySubtotal.innerText = `${data.original_cart_total.toFixed(2)} €`;
-                }
-
-                const summarySavings = document.getElementById("cart-summary-savings");
-                if(summarySavings && data.total_savings !== undefined) {
-                    summarySavings.innerText = `-${data.total_savings.toFixed(2)} €`;
-                }
-
-                const badge = document.getElementById("cart-count");
-                if (badge) {
-                    badge.innerText = data.cart_count;
-                }
-
-                const summaryCount = document.getElementById("cart-summary-count");
-                if(summaryCount) {
-                    summaryCount.innerText = data.cart_count;
-                }
-
-                if(typeof UpdateMiniCart === "function") {
-                    UpdateMiniCart();
-                }
-            }        
-        });
+                removeStockWarningIfFixed(card, input, data);
+                updateItemTotal(card, data);
+                updateCartSummary(data);                     
+            }
+        });        
     });
 
     document.addEventListener("click", function(e) {
