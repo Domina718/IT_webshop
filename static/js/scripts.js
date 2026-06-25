@@ -24,6 +24,111 @@ document.addEventListener("DOMContentLoaded", function() {
         el.innerText = current + delta;
     }
 
+    function showEmptyCartIfNeeded(cartCount) {
+        cartCount = parseInt(cartCount);
+
+        if(cartCount > 0) return;
+
+        const cartItems = document.getElementById("cart-items");
+        const orderSummary = document.getElementById("order-summary");
+
+        if(cartItems) {
+            cartItems.innerHTML = `<p class="text-muted">Your cart is empty.</p>`;
+        }
+
+        if(orderSummary) {
+            orderSummary.remove();
+        }
+    }
+
+    function refreshCartBadge() {
+        fetch("/cart/count/")
+            .then(res => res.json())
+            .then(data => {
+                const badge = document.getElementById("cart-count");
+
+                if(badge) {
+                    badge.innerText = data.count;
+
+                    if(data.count > 0) {
+                        badge.classList.remove("d-none");
+                    }
+                    else {
+                        badge.classList.add("d-none");
+                    }
+                }
+            });
+    }
+
+    function UpdateMiniCart() {
+        fetch("/cart/mini/")
+        .then(res => res.json())
+        .then(data => {
+            const miniCart = document.getElementById("mini-cart-dropdown");
+            if(!miniCart) return;
+
+            if(data.count === 0) {
+                miniCart.innerHTML = `
+                <p class="text-muted mb-2">Your cart is empty.</p>
+                <a href="/products/" class="btn btn-primary btn-sm w-100">
+                    Browse products
+                </a>
+            `;
+            return;
+            }
+
+            let html = "";
+
+            data.items.forEach(item => {
+                html += `
+                    <div class="d-flex border-bottom pb-2 mb-2 mini-cart-item">
+                        <div class="mini-cart-image-box">
+                            <img src="${item.image}" class="rounded me-2 mini-cart-image">
+                        </div>
+                        <div class="flex-grow-1">
+                            <div class="fw-semibold">${item.name}</div>
+
+                            ${item.has_discount ? `
+                                <small class="text-muted">
+                                    ${item.quantity} x 
+                                    <span class="text-decoration-line-through">
+                                        ${item.original_price.toFixed(2)} €
+                                    </span>
+                                    <span class="text-danger fw-bold">
+                                        ${item.price.toFixed(2)} €
+                                    </span>
+                                    <span class="badge bg-danger ms-1">
+                                        -${item.discount_percent}%
+                                    </span>
+                                </small>
+                            `:`
+                                <small class="text-muted">
+                                    ${item.quantity} x ${item.price.toFixed(2)} €
+                                </small>                         
+                            `}
+                            <div class="fw-bold">
+                                ${item.total_price.toFixed(2)} €
+                            </div>
+                        </div>
+                    </div>
+                `;
+                });
+
+                html += `
+                    <div class="d-flex justify-content-between fw-bold mt-2">
+                        <span>Total:</span>
+                        <span>${data.total.toFixed(2)} € </span>
+                    </div>
+                    
+                    <a href="/cart/" class="btn btn-success btn-sm w-100 mt-3">
+                        View cart
+                    </a>
+                `;
+
+                miniCart.innerHTML = html;         
+            });
+    }
+
     document.addEventListener("submit", function(e) {
 
         const form = e.target 
@@ -319,39 +424,6 @@ document.addEventListener("DOMContentLoaded", function() {
         }
     });
 
-    function showEmptyCartIfNeeded(cartCount) {
-        cartCount = parseInt(cartCount);
 
-        if(cartCount > 0) return;
-
-        const cartItems = document.getElementById("cart-items");
-        const orderSummary = document.getElementById("order-summary");
-
-        if(cartItems) {
-            cartItems.innerHTML = `<p class="text-muted">Your cart is empty.</p>`;
-        }
-
-        if(orderSummary) {
-            orderSummary.remove();
-        }
-    }
-
-    function refreshCartBadge() {
-        fetch("/cart/count/")
-            .then(res => res.json())
-            .then(data => {
-                const badge = document.getElementById("cart-count");
-
-                if(badge) {
-                    badge.innerText = data.count;
-
-                    if(data.count > 0) {
-                        badge.classList.remove("d-none");
-                    }
-                    else {
-                        badge.classList.add("d-none");
-                    }
-                }
-            });
-    }
+    UpdateMiniCart();
 })

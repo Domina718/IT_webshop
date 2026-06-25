@@ -316,4 +316,30 @@ def cart_count(request):
         "count": len(cart)
     })
 
+def mini_cart(request):
+    if request.user.is_authenticated:
+        cart = DatabaseCart(request.user)
+    else:
+        cart = Cart(request)
+
+    items = []
+
+    for item in cart:
+        items.append({
+            "name": item["product"].name,
+            "quantity": item["quantity"],
+            "price": float(item["price"]),
+            "original_price": float(item["original_price"]),
+            "total_price": float(item["total_price"]),
+            "has_discount": item["has_discount"],
+            "discount_percent": item["discount_percent"],
+            "image": item["product"].image.url if item["product"].image else "",
+        })
+
+    return JsonResponse({
+        "count": len(cart),
+        "total": float(cart.get_total_price()),
+        "items": items[:5]
+    })
+
 

@@ -9,106 +9,184 @@
         <link rel="stylesheet" href="{% static 'css/style.css' %}">
     </head>
     <body>
-        <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+        <nav class="navbar navbar-expand-lg navbar-dark bg-dark fixed-top">
             <div class="container">
                 <a class="navbar-brand" href="{% url 'shop:home' %}">IT Webshop</a>
 
-                <div class="collapse navbar-collapse">
-                    <ul class="navbar-nav me-auto">
+                <button class="navbar-toggler"
+                        type="button"
+                        data-bs-toggle="offcanvas"
+                        data-bs-target="#mobileMenu"
+                        aria-controls="mobileMenu">
+                    <span class="navbar-toggler-icon"></span>
+                </button>
 
-                        <li class="nav-item">
-                            <a class="nav-link" href="{% url 'shop:home' %}">Home</a>
-                        </li>
+                <div class="collapse navbar-collapse" id="mainNavbar">
+                    <div class="d-lg-flex w-100 justify-content-between">
+                        <ul class="navbar-nav me-auto">
 
-                        <li class="nav-item">
-                            <a class="nav-link" href="{% url 'shop:product_list' %}">Products</a>
-                        </li>
-                    
-                    </ul>
-
-                    <ul class="navbar-nav align-items-center">   
-
-                        <li class="nav-item me-3">
-                            <a href="{% url 'cart:cart_detail' %}"
-                               class="btn btn-outline-light position-relative fw-medium">
-
-                               🛒 Cart
-                               
-                                <span id="cart-count"
-                                        class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger {% if cart|length == 0 %} d-none{% endif %}">
-                                    {{ cart|length }}
-                                </span>
-                            </a>
-                        </li>
-
-                        {% if user.is_authenticated %}
-
-                            <li class="nav-item dropdown">
-                                <a class="nav-link dropdown-toggle" 
-                                   href="#"
-                                   role="button"
-                                   data-bs-toggle="dropdown"
-                                   aria-expanded="false">
-                                    Account
-                                </a>
-
-                                <ul class="dropdown-menu dropdown-menu-end">
-                                    
-                                    <li>
-                                        <a class="dropdown-item"
-                                        href="{% url 'users:profile' %}">
-                                            {{ request.user.username }}'s Profile
-                                        </a>
-                                    </li>
-
-                                    <li>
-                                        <a class="dropdown-item"
-                                        href="{% url 'orders:my_orders' %}">
-                                            My Orders
-                                        </a>
-                                    </li>
-
-                                    <li><hr class="dropdown-divider"></li>
-
-                                    <li>
-                                        <form method="post" action="{% url 'logout' %}">
-                                            {% csrf_token %}
-                                            <button type="submit" class="dropdown-item">
-                                                Logout    
-                                            </button>
-                                        </form>
-                                    </li>
-
-                                </ul>
-                            </li>
-
-                        {% else %}
-
-                            <li class="nav-item me-2">
-                                <a class="nav-link" 
-                                    href="{% url 'login' %}">
-                                    Login
-                                </a>
+                            <li class="nav-item">
+                                <a class="nav-link" href="{% url 'shop:home' %}">Home</a>
                             </li>
 
                             <li class="nav-item">
-                                <a class="nav-link" 
-                                    href="{% url 'users:register' %}">
-                                    Register
-                                </a>
+                                <a class="nav-link" href="{% url 'shop:product_list' %}">Products</a>
+                            </li>
+                        
+                        </ul>
+
+                        <ul class="navbar-nav align-items-center">   
+
+                            <li class="nav-item dropdown me-3">
+                                <button class="btn btn-outline-light dropdown-toggle position-relative fw-medium"
+                                        type="button"
+                                        data-bs-toggle="dropdown"
+                                        data-bs-auto-close="outside">
+                                🛒 Cart
+                                
+                                    <span id="cart-count"
+                                            class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger {% if cart|length == 0 %} d-none{% endif %}">
+                                        {{ cart|length }}
+                                    </span>
+                                </button>
+
+                                <div class="dropdown-menu dropdown-menu-end p-3"
+                                    style="min-width: 320px;"
+                                    id="mini-cart-dropdown">
+
+                                    <p class="text-muted mb-0">Loading cart...</p>
+                                
+                                </div>
                             </li>
 
-                        {% endif %}
+                            {% if user.is_authenticated %}
 
-                    </ul> 
+                                <li class="nav-item dropdown">
+                                    <a class="nav-link dropdown-toggle" 
+                                    href="#"
+                                    role="button"
+                                    data-bs-toggle="dropdown"
+                                    aria-expanded="false">
+                                        Account
+                                    </a>
+
+                                    <ul class="dropdown-menu dropdown-menu-end">
+                                        
+                                        <li>
+                                            <a class="dropdown-item"
+                                            href="{% url 'users:profile' %}">
+                                                {{ request.user.username }}'s Profile
+                                            </a>
+                                        </li>
+
+                                        <li>
+                                            <a class="dropdown-item"
+                                            href="{% url 'orders:my_orders' %}">
+                                                My Orders
+                                            </a>
+                                        </li>
+
+                                        <li><hr class="dropdown-divider"></li>
+
+                                        <li>
+                                            <form method="post" action="{% url 'logout' %}">
+                                                {% csrf_token %}
+                                                <button type="submit" class="dropdown-item">
+                                                    Logout    
+                                                </button>
+                                            </form>
+                                        </li>
+
+                                    </ul>
+                                </li>
+
+                            {% else %}
+
+                                <li class="nav-item me-2">
+                                    <a class="nav-link" 
+                                        href="{% url 'login' %}">
+                                        Login
+                                    </a>
+                                </li>
+
+                                <li class="nav-item">
+                                    <a class="nav-link" 
+                                        href="{% url 'users:register' %}">
+                                        Register
+                                    </a>
+                                </li>
+
+                            {% endif %}
+
+                        </ul> 
+                    </div>
                 </div>
             </div>
         </nav>
 
-        <div class="container mt-4 mb-5">
+        <div class="offcanvas offcanvas-end text-bg-dark"
+             tabindex="-1"
+             id="mobileMenu">
+            <div class="offcanvas-header">
+                <h5 class="offcanvas-title">IT Webshop</h5>
+                <button type="button"
+                        class="btn-close btn-close-white"
+                        data-bs-dismiss="offcanvas"></button>
+            </div> 
+            <div class="offcanvas-body">
+
+                <a class="nav-link text-white mb-3"
+                   href="{% url 'shop:home' %}">
+                    Home
+                </a>
+
+                <a class="nav-link text-white mb-3"
+                   href="{% url 'shop:product_list' %}">
+                    Products
+                </a>
+
+                <a class="nav-link text-white mb-3"
+                   href="{% url 'cart:cart_detail' %}">
+                    🛒 Cart
+                </a>
+
+                {% if user.is_authenticated %}
+
+                    <a class="nav-link text-white mb-3"
+                        href="{% url 'users:profile' %}">
+                        {{ request.user.username }}'s Profile
+                    </a>
+
+                    <a class="nav-link text-white mb-3"
+                       href="{% url 'orders:my_orders' %}">
+                        My Orders
+                    </a>
+
+                    <form method="post" action="{% url 'logout' %}">
+                        {% csrf_token %}
+                        <button type="submit" class="btn btn-outline-light w-100">
+                            Logout
+                        </button>
+                    </form>
+                {% else %}
+
+                    <a class="nav-link text-white mb-3"
+                        href="{% url 'login' %}">
+                        Login
+                    </a>
+
+                    <a class="nav-link text-white mb-3"
+                        href="{% url 'users:register' %}">
+                        Register
+                    </a>
+                {% endif %}
+            </div>  
+        </div>
+
+        <main class="container page-content mb-5">
             {% block content %}
             {% endblock %}
-        </div>
+        </main>
 
 
         <div class="toast-container position-fixed top-0 start-50 translate-middle-x p-3">

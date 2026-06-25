@@ -15,8 +15,7 @@
                 {% if product.image %}
 
                     <img src="{{ product.image.url }}" 
-                        class="card-img-top"
-                        style="height:450px; object-fit: cover;">
+                        class="card-img-top product-detail-image">
 
                 {% else %}
 
@@ -238,8 +237,7 @@
                                                     {% if item.image %}
 
                                                         <img src="{{ item.image.url }}"
-                                                             class="card-img-top"
-                                                             style="height:120px; object-fit:cover;">
+                                                             class="card-img-top compatible-product-image">
                                                     
                                                     {% endif %}
 
@@ -349,39 +347,44 @@
 
                 {% for item in recommended_products %}
 
-                    <div class="card flex-shrink-0 shadow-sm h-100 recommended-card">
+                    <div class="card flex-shrink-0 shadow-sm recommended-card">
 
-                        {% if item.image %}
-                            <img src="{{ item.image.url }}"
-                                class="card-img-top"
-                                style="height: 140px; object-fit: cover;">
-                        {% endif %}
+                        <div class="recommended-image-box">
+
+                            {% if item.image %}
+                                <img src="{{ item.image.url }}"
+                                    class="card-img-top recommended-product-image"
+                                    alt="{{ item.name }}">
+                            {% else %}
+                                <div class="recommended-image-placeholder">
+                                    No image
+                                </div>
+                            {% endif %}
+                        </div>
 
                         <div class="card-body d-flex flex-column">
 
-                            <h6 class="fw-bold mb-1">
+                            <h6 class="fw-bold mb-1 recommended-title">
                                 {{ item.name }}
                             </h6>
 
-                            {% if item.has_discount %}
-                                <div class="mb-2">
+                            <div class="recommended-price">
+                                {% if item.has_discount %}
                                     <span class="badge bg-danger">
                                         -{{ item.discount_percent }}%  
                                     </span>
-
                                     <div>
                                         <small class="text-muted text-decoration-line-through">
                                             {{ item.price }} €
                                         </small>
                                     </div>
-
                                     <div class="text-danger fw-bold">
                                         {{ item.discount_price|floatformat:2 }} €
                                     </div>
-                                </div>
-                            {% else %}
-                                <p class="fw-bold text-success mb-2">{{ item.price }} €</p>
-                            {% endif %}
+                                {% else %}
+                                    <p class="fw-bold text-success mb-2">{{ item.price }} €</p>
+                                {% endif %}
+                            </div>   
 
                             <form action="{% url 'cart:add_to_cart' item.id %}"
                                   method="post"
