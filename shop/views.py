@@ -120,7 +120,7 @@ def product_detail(request, pk):
         ).exists()
 
         if not can_review:
-            return redirect('shop:product_detail, pk = product.pk')
+            return redirect('shop:product_detail', pk = product.pk)
 
         form = ReviewForm(request.POST)
 

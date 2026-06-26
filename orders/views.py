@@ -68,7 +68,7 @@ def order_create(request):
 
                 messages.error(request, str(e))
 
-                return redirect
+                return redirect ('orders:order_create')
 
             cart.clear()
 

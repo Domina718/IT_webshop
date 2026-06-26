@@ -73,6 +73,9 @@ document.addEventListener("DOMContentLoaded", function() {
                 <a href="/products/" class="btn btn-primary btn-sm w-100">
                     Browse products
                 </a>
+                <a href="/cart/" class="btn btn-success btn-sm w-100 mt-3">
+                    View cart
+                </a>
             `;
             return;
             }
@@ -175,6 +178,10 @@ document.addEventListener("DOMContentLoaded", function() {
         .then(data => {
             notify(data.type, data.message);
 
+            if(data.compatibility_warnings && data.compatibility_warnings.length > 0) {
+                notify("warning", "Compatibility warning: " + data.compatibility_warnings[0]);
+            }
+
             if (data.ok) {
                 refreshCartBadge();
                 if(typeof UpdateMiniCart === "function") {
@@ -231,7 +238,7 @@ document.addEventListener("DOMContentLoaded", function() {
 
                 const summaryTotal= document.getElementById("cart-summary-total");
                 if (summaryTotal) {
-                    summaryTotal.innerText = `${data.cart_total} €`;
+                    summaryTotal.innerText = `${Number(data.cart_total).toFixed(2)} €`;
                 }
 
                 const summarySubtotal = document.getElementById("cart-summary-subtotal");
@@ -251,6 +258,10 @@ document.addEventListener("DOMContentLoaded", function() {
 
                 showEmptyCartIfNeeded(data.cart_count);
 
+                if(data.compatibility_warnings !== undefined) {
+                    updateCompatibilityStatus(data);
+                }
+
                 const modalEl = btn.closest(".modal");
                 if (modalEl) {
                     const modal = bootstrap.Modal.getInstance(modalEl);
@@ -266,8 +277,8 @@ document.addEventListener("DOMContentLoaded", function() {
 
     function updateCartSummary(data) {
         const summaryTotal= document.getElementById("cart-summary-total");
-        if (summaryTotal) {
-            summaryTotal.innerText = `${data.cart_total} €`;
+        if (summaryTotal && data.cart_total !== undefined) {
+            summaryTotal.innerText = `${Number(data.cart_total).toFixed(2)} €`;
         }
 
         const summarySubtotal = document.getElementById("cart-summary-subtotal");
@@ -298,6 +309,53 @@ document.addEventListener("DOMContentLoaded", function() {
         if(typeof UpdateMiniCart === "function") {
             UpdateMiniCart();
         }
+    }
+
+    function updateCompatibilityStatus(data) {
+        if(!("compatibility_warnings" in data)) return;
+
+        const card = document.getElementById("compatibility-status");
+        if(!card) return;
+
+        const warnings = data.compatibility_warnings;
+
+        if(warnings.length === 0) {
+            card.className = "card mb-4 shadow-sm border-success";
+            card.innerHTML = `<div class="card-header bg-success text-white">
+                                  <strong>✓ Compatibility status</strong>
+                              </div>
+                              
+                              <div class="card-body">
+                                  <p class="mb-0 text-success">
+                                      All components in your cart are compatible.
+                                  </p>
+                              </div>
+                            `;
+
+            return;
+        }
+
+        let html =`<div class="card-header bg-danger text-white">
+                       <strong>⚠ Compatibility status</strong>
+                   </div>
+                   <div class="card-body">
+                       <p class="mb-2">
+                           ${warnings.length} compatibility issue${warnings.length === 1 ? "" : "s"} detected.
+                       </p>
+                       <ul class="mb-0">
+                  `;
+        warnnings.forEach(warning => {
+            html += `<li>${warning}</li>`;
+        });
+
+        html += `
+                </ul>
+            </div>
+        `;
+
+        card.className = "card mb-4 shadow-sm border-danger";
+        card.innerHTML = html;
+                       
     }
 
     function updateItemTotal(card, data) {
@@ -331,15 +389,7 @@ document.addEventListener("DOMContentLoaded", function() {
 
             const anyStockWarningsLeft = document.querySelector(".stock-warning-block");
             if(!anyStockWarningsLeft) {
-                const disabledBlock = document.getElementById("checkout-disabled-block");
-
-                if (disabledBlock) {
-                    disabledBlock.innerHTML = `
-                        <a href="/orders/checkout/" id="checkout-enabled-btn" class="btn btn-success btn-lg w-100 mb-2">
-                            🛒 Proceed to Checkout
-                        </a>
-                    `;
-                }
+                location.reload();
             }
         }
 

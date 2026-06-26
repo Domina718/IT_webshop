@@ -8,7 +8,8 @@ class CompatibilityRule(models.Model):
         ('RAM_MB', 'RAM -> Motherboard'),
         ('SSD_MB', 'SSD -> Motherboard'),
         ('GPU_PSU', 'GPU -> PSU'),
-        ('GPU_CASE', 'GPU -> CASE'),
+        ('GPU_CASE', 'GPU -> Case'),
+        ('MB_CASE', 'Motherboard -> Case')
     ]
 
     product = models.ForeignKey(

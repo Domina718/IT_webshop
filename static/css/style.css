@@ -3,6 +3,13 @@
     padding-top: 80px;
 }
 
+.cart-sidebar {
+    position: sticky;
+    top: 90px;
+    z-index: 10;
+}
+
+
 .navbar.fixed-top {
     position: fixed !important;
     top: 0;
@@ -10,7 +17,6 @@
     right: 0;
     z-index: 1050;
 }
-
 
 .navbar .nav-link {
     color: rgba(255, 255, 255, 0.85);

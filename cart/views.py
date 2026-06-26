@@ -48,6 +48,8 @@ def add_to_cart(request, product_id):
         cart_item.quantity = new_quantity
         cart_item.save()
 
+        cart = DatabaseCart(request.user)
+
     else:
         cart = Cart(request)
 
@@ -69,19 +71,23 @@ def add_to_cart(request, product_id):
         quantity_to_add = min(requested_quantity, available_quantity)
         cart.add(product_id, quantity_to_add)
 
+    compatibility_warnings = check_compatibility(list(cart))
+
     if quantity_to_add < requested_quantity:
-
-
             return JsonResponse({
                     "ok": True,
                     "type": "warning",
-                    "message": f"Only {quantity_to_add}x {product.name} added. Stock limit reached."
+                    "message": f"Only {quantity_to_add}x {product.name} added. Stock limit reached.",
+                    "compatibility_warnings": compatibility_warnings,
                 })
+
+    response_type = "warning" if compatibility_warnings else "success"
     
     return JsonResponse({
                     "ok": True,
-                    "type": "success",
-                    "message": f"{quantity_to_add}x  {product.name} added to cart ✓"
+                    "type": response_type,
+                    "message": f"{quantity_to_add}x {product.name} added to cart ✓",
+                    "compatibility_warnings": compatibility_warnings,
                 })
 
 
@@ -126,6 +132,7 @@ def remove_from_cart(request, product_id):
                     "cart_total": cart.get_total_price(),
                     "original_cart_total": float(cart.get_original_total_price()),
                     "total_savings": float(cart.get_total_savings()),
+                    "compatibility_warnings": check_compatibility(list(cart))
                 })
 
 
@@ -201,88 +208,103 @@ def check_compatibility(cart_items):
     
     warnings = []
 
-    sockets = {}
-    ram_types = {}
-
     products = []
 
     for item in cart_items:
+        products.append(item['product'])
 
-        product = item['product']
-        products.append(product)
+    cpus = [
+        product for product in products 
+        if product.socket and product.category.name.lower() == "cpu"
+    ]
 
-        if product.socket:
-            sockets.setdefault(
-                product.socket,
-                []
-            ).append(product.name)
+    motherboards_with_socket = [
+        product for product in products 
+        if product.socket and product.category.name.lower() in ["motherboard", "motherboards"]
+    ]
+    
+    for cpu in cpus:
+        for motherboard in motherboards_with_socket:
+            if cpu.socket != motherboard.socket:
+                warnings.append(
+                    f"{cpu.name} ({cpu.socket}) is not compatible with "
+                    f"{motherboard.name} ({motherboard.socket})." 
+                )
+    ram_modules = [
+        product for product in products 
+        if product.ram_type and product.category.name.lower() == "ram"   
+    ]
+    
+    motherboards_with_ram = [
+        product for product in products 
+        if product.ram_type and product.category.name.lower() in ["motherboard", "motherboards"]
+    ]
 
-        if product.ram_type:
-            ram_types.setdefault(
-                product.ram_type,
-                []
-            ).append(product.name)
+    for ram in ram_modules:
+        for motherboard in motherboards_with_ram:
+            if ram.ram_type != motherboard.ram_type:
+                warnings.append(
+                    f"{ram.name} ({ram.ram_type}) is not compatible with "
+                    f"{motherboard.name} ({motherboard.ram_type})." 
+                )
 
-    if len(sockets) > 1:
-        warnings.append(
-            "Socket mismatch: " + ", ".join(
-                [
-                    f"{socket}: {', '.join(products)}"
-                    for socket, products in sockets.items()
-                ]
-            )
-        )
+    gpus = [
+        product for product in products 
+        if product.category.name.lower() == "gpu"   
+    ]
+    
+    psus = [
+        product for product in products 
+        if product.psu_wattage
+    ]
 
-    if len(ram_types) > 1:
-        warnings.append(
-            "RAM type mismatch: " + ", ".join(
-                [
-                    f"{ram}: {', '.join(products)}"
-                    for ram, products in ram_types.items()
-                ]
-            )
-        )
-
-    for gpu in products:
-        
+    for gpu in gpus:
         if gpu.power_required:
+            for psu in psus:
+                if psu.wattage < gpu.power_required:
+                    warnings.append(
+                        f"{gpu.name} requires at least {gpu.power_required}W, "
+                        f"but {psu.name} ({psu.psu_wattage})W." 
+                    )
+    
+    cases = [
+        product for product in products
+        if product.max_gpu_length
+    ]
 
-            for psu in products:
-
-                if psu.psu_wattage:
-
-                    if psu.psu_wattage < gpu.power_required:
-
-                        warnings.append(
-                            f"{gpu.name} requires "
-                            f"{gpu.power_required}W PSU, "
-                            f"but {psu.name} has "
-                            f"{psu.psu_wattage}W."
-                        )
-
-    for gpu in products:
-        
+    for gpu in gpus:
         if gpu.gpu_length:
+            for case in cases:
+                if psu.gpu_length > case.max_gpu_length:
+                    warnings.append(
+                        f"{gpu.name} ({gpu.gpu_length} mm) does not fit in "
+                        f"{case.name} (max {case.max_gpu_length} mm)." 
+                    )
 
-            for case in products:
+    #motherboards_with_form_factor = [
+    #    product for product in products 
+    #    if product.form_factor and product.category.name.lower() in ["motherboard", "motherboards"]
+    #]
 
-                if case.max_gpu_length:
+    #cases_with_form_factor = [
+    #    product for product in products 
+    #    if product.form_factor and product.category.name.lower() in ["case", "cases"]
+    #]
 
-                    if gpu.gpu_length > case.max_gpu_length:
-
-                        warnings.append(
-                            f"{gpu.name} does not fit in "
-                            f"{case.name}. "
-                            f"GPU length: {gpu.gpu_length}mm, "
-                            f"case supports: {case.max_gpu_length}mm."
-                        )
+    #for motherboard in motherboards_with_form_factor:
+    #    for case in cases_with_form_factor:
+    #        if motherboard.form_factor != case.form_factor:
+    #            warnings.append(
+    #                f"{motherboard.name} ({motherboard.form_factor}) may not fit in "
+    #                f"{case.name} ({case.form_factor})." 
+    #            )
 
     return warnings
 
 
 def cart_detail(request):
 
-    if request.user.is_authenticated:
+    if request.user.is_authenticated: 
 
         cart = DatabaseCart(request.user)
 
