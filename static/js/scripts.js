@@ -5,9 +5,24 @@ document.addEventListener("DOMContentLoaded", function() {
     }
 
     function showToast(message) {
-        const el = document.getElementById("cartToast");
-        el.querySelector(".toast-body").innerText = message;
-        new bootstrap.Toast(el).show();
+        const container = document.getElementById("toast-container");
+        const toast = document.createElement("div");
+        toast.className = "toast show mb-2";
+
+        toast.innerHTML = `
+            <div class="toast-header">
+                <strong class="me-auto">IT Webshop</strong>
+
+                <button class="btn-close" data-bs-dismiss="toast"></button>
+            </div>
+            <div class="toast-body">${message}</div>
+        `;
+
+        container.appendChild(toast);
+        const bsToast = new bootstrap.Toast(toast, {delay: 3500});
+
+        bsToast.show();
+        toast.addEventListener("hidden.bs.toast", () => {toast.remove();});
     }
 
     function notify(type, message) {
@@ -178,8 +193,8 @@ document.addEventListener("DOMContentLoaded", function() {
         .then(data => {
             notify(data.type, data.message);
 
-            if(data.compatibility_warnings && data.compatibility_warnings.length > 0) {
-                notify("warning", "Compatibility warning: " + data.compatibility_warnings[0]);
+            if(data.new_compatibility_warnings && data.new_compatibility_warnings.length > 0) {
+                notify("warning", "Compatibility warning:\n• " + data.new_compatibility_warnings.join("\n• "));
             }
 
             if (data.ok) {

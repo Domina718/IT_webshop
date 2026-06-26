@@ -17,6 +17,13 @@ def add_to_cart(request, product_id):
     requested_quantity = int(request.POST.get('quantity', 1))
 
     if request.user.is_authenticated:
+        old_cart = DatabaseCart(request.user)
+    else:
+        old_cart = Cart(request)
+
+    old_warnings = check_compatibility(list(old_cart))
+
+    if request.user.is_authenticated:
         
         user_cart, created = UserCart.objects.get_or_create(
             user = request.user
@@ -72,6 +79,11 @@ def add_to_cart(request, product_id):
         cart.add(product_id, quantity_to_add)
 
     compatibility_warnings = check_compatibility(list(cart))
+    
+    new_compatibility_warnings = [
+        warning for warning in compatibility_warnings
+        if warning not in old_warnings
+    ]
 
     if quantity_to_add < requested_quantity:
             return JsonResponse({
@@ -79,15 +91,16 @@ def add_to_cart(request, product_id):
                     "type": "warning",
                     "message": f"Only {quantity_to_add}x {product.name} added. Stock limit reached.",
                     "compatibility_warnings": compatibility_warnings,
+                    "new_compatibility_warnings": new_compatibility_warnings,
                 })
 
-    response_type = "warning" if compatibility_warnings else "success"
     
     return JsonResponse({
                     "ok": True,
-                    "type": response_type,
+                    "type": "success",
                     "message": f"{quantity_to_add}x {product.name} added to cart ✓",
                     "compatibility_warnings": compatibility_warnings,
+                    "new_compatibility_warnings": new_compatibility_warnings,
                 })
 
 
@@ -261,7 +274,7 @@ def check_compatibility(cart_items):
     for gpu in gpus:
         if gpu.power_required:
             for psu in psus:
-                if psu.wattage < gpu.power_required:
+                if psu.psu_wattage < gpu.power_required:
                     warnings.append(
                         f"{gpu.name} requires at least {gpu.power_required}W, "
                         f"but {psu.name} ({psu.psu_wattage})W." 
@@ -275,7 +288,7 @@ def check_compatibility(cart_items):
     for gpu in gpus:
         if gpu.gpu_length:
             for case in cases:
-                if psu.gpu_length > case.max_gpu_length:
+                if gpu.gpu_length > case.max_gpu_length:
                     warnings.append(
                         f"{gpu.name} ({gpu.gpu_length} mm) does not fit in "
                         f"{case.name} (max {case.max_gpu_length} mm)." 
