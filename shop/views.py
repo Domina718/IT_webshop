@@ -3,7 +3,6 @@ from django.db.models import Avg, Q, Count
 from .models import Product, Category, Review
 from compatibility.models import CompatibilityRule
 from .forms import ReviewForm
-from .models import Product
 from orders.models import OrderItem
 
 
@@ -38,6 +37,16 @@ def product_list(request):
         if item.strip()
     ]
 
+    stock_status_options = [
+        "in_stock",
+        "low_stock",
+        "out_of_stock",
+    ]
+    stock_status_selected =  [
+        item for item in request.GET.getlist('stock_status')
+        if item.strip()
+    ]
+
     if query:
         products = products.filter(
             Q(name__icontains = query) |
@@ -64,6 +73,19 @@ def product_list(request):
 
     if storage_types_selected:
         products = products.filter(storage_type__in = storage_types_selected)
+    
+    if stock_status_selected:
+        stock_query = Q()
+
+        if "in_stock" in stock_status_selected:
+            stock_query |= Q(stock__gt=7)
+        if "low_stock" in stock_status_selected:
+            stock_query |= Q(stock__gt=0, stock__lte=7)
+        if "out_of_stock" in stock_status_selected:
+            stock_query |= Q(stock=0)
+
+        products = products.filter(stock_query)
+        
 
 
     brands = Product.objects.exclude(brand='').values_list('brand', flat=True).distinct()
@@ -96,6 +118,8 @@ def product_list(request):
         'sockets_selected': sockets_selected,
         'ram_types_selected': ram_types_selected,
         'storage_types_selected': storage_types_selected,
+        'stock_status_options': stock_status_options,
+        'stock_status_selected': stock_status_selected,
     })
 
 

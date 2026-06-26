@@ -17,13 +17,6 @@ def add_to_cart(request, product_id):
     requested_quantity = int(request.POST.get('quantity', 1))
 
     if request.user.is_authenticated:
-        old_cart = DatabaseCart(request.user)
-    else:
-        old_cart = Cart(request)
-
-    old_warnings = check_compatibility(list(old_cart))
-
-    if request.user.is_authenticated:
         
         user_cart, created = UserCart.objects.get_or_create(
             user = request.user
@@ -80,9 +73,9 @@ def add_to_cart(request, product_id):
 
     compatibility_warnings = check_compatibility(list(cart))
     
-    new_compatibility_warnings = [
+    product_related_warnings = [
         warning for warning in compatibility_warnings
-        if warning not in old_warnings
+        if product.name in warning
     ]
 
     if quantity_to_add < requested_quantity:
@@ -91,7 +84,7 @@ def add_to_cart(request, product_id):
                     "type": "warning",
                     "message": f"Only {quantity_to_add}x {product.name} added. Stock limit reached.",
                     "compatibility_warnings": compatibility_warnings,
-                    "new_compatibility_warnings": new_compatibility_warnings,
+                    "product_related_warnings": product_related_warnings,
                 })
 
     
@@ -100,7 +93,7 @@ def add_to_cart(request, product_id):
                     "type": "success",
                     "message": f"{quantity_to_add}x {product.name} added to cart ✓",
                     "compatibility_warnings": compatibility_warnings,
-                    "new_compatibility_warnings": new_compatibility_warnings,
+                    "product_related_warnings": product_related_warnings,
                 })
 
 
@@ -240,8 +233,8 @@ def check_compatibility(cart_items):
         for motherboard in motherboards_with_socket:
             if cpu.socket != motherboard.socket:
                 warnings.append(
-                    f"{cpu.name} ({cpu.socket}) is not compatible with "
-                    f"{motherboard.name} ({motherboard.socket})." 
+                    f"<strong>{cpu.name}</strong> ({cpu.socket}) is not compatible with "
+                    f"<strong>{motherboard.name}</strong> ({motherboard.socket})." 
                 )
     ram_modules = [
         product for product in products 
@@ -257,8 +250,8 @@ def check_compatibility(cart_items):
         for motherboard in motherboards_with_ram:
             if ram.ram_type != motherboard.ram_type:
                 warnings.append(
-                    f"{ram.name} ({ram.ram_type}) is not compatible with "
-                    f"{motherboard.name} ({motherboard.ram_type})." 
+                    f"<strong>{ram.name}</strong> ({ram.ram_type}) is not compatible with "
+                    f"<strong>{motherboard.name}</strong> ({motherboard.ram_type})." 
                 )
 
     gpus = [
@@ -276,8 +269,8 @@ def check_compatibility(cart_items):
             for psu in psus:
                 if psu.psu_wattage < gpu.power_required:
                     warnings.append(
-                        f"{gpu.name} requires at least {gpu.power_required}W, "
-                        f"but {psu.name} ({psu.psu_wattage})W." 
+                        f"<strong>{gpu.name}</strong> requires at least {gpu.power_required}W, "
+                        f"but <strong>{psu.name}</strong> ({psu.psu_wattage})W." 
                     )
     
     cases = [
@@ -290,8 +283,8 @@ def check_compatibility(cart_items):
             for case in cases:
                 if gpu.gpu_length > case.max_gpu_length:
                     warnings.append(
-                        f"{gpu.name} ({gpu.gpu_length} mm) does not fit in "
-                        f"{case.name} (max {case.max_gpu_length} mm)." 
+                        f"<strong>{gpu.name}</strong> ({gpu.gpu_length} mm) does not fit in "
+                        f"<strong>{case.name}</strong> (max {case.max_gpu_length} mm)." 
                     )
 
     #motherboards_with_form_factor = [

@@ -154,9 +154,39 @@
                     placeholder="Max price">
             </div>
 
+            <div class="col-md-auto dropdown">
+                <button class="btn btn-outline-secondary dropdown-toggle w-100"
+                        type="button"
+                        data-bs-toggle="dropdown"
+                        data-bs-auto-close="outside">
+                    Stock
+                </button>
+                <div class="dropdown-menu p-3" style="min-width: 220px;">
+                    {% for item in stock_status_options %}
+                        <div class="form-check">
+                            <input class="form-check-input"
+                                    type="checkbox"
+                                    name="stock_status"
+                                    value="{{ item }}"
+                                    id="stock-{{ forloop.counter }}"
+                                    {% if item in stock_status_selected %}checked{% endif %}>
+                            <label class="form-check-label d-block w-100" for="stock-{{ forloop.counter}}">
+                                {% if item == "in_stock" %}
+                                    In stock
+                                {% elif item == "low_stock" %}
+                                    Low stock
+                                {% elif item == "out_of_stock" %}
+                                    Out of stock
+                                {% endif %}
+                            </label>  
+                        </div>
+                    {% endfor %}
+                </div>
+            </div>
+
             <div class="col-md-auto">
                 <button class="btn btn-primary">Filter</button>
-                <a href="{% url 'shop:product_list' %}" class="btn btn-outline-secondary">
+                <a href="{% url 'shop:product_list' %}" class="btn btn-outline-danger">
                     Reset
                 </a>
             </div>
@@ -165,7 +195,7 @@
         
     </form>
 
-    {% if categories_selected or brands_selected or sockets_selected or ram_types_selected or storage_types_selected %}
+    {% if query or categories_selected or brands_selected or sockets_selected or ram_types_selected or storage_types_selected or min_price or max_price or stock_status_selected %}
 
         <div class="mb-3 d-flex flex-wrap gap-2 align-items-center">
 
@@ -174,6 +204,13 @@
             {% if query %}
                 <span class="badge bg-primary fs-6 py-2 px-3">
                     Search: {{ query }}
+                    <button type="button"
+                            class="remove-filter"
+                            data-name="q"
+                            data-value="{{ item }}"
+                            aria-label="Remove">
+                            X
+                    </button>
                 </span>
             {% endif %}
 
@@ -181,6 +218,13 @@
                 {% if category.id in categories_selected %}
                     <span class="badge rounded-pill bg-primary fs-6 py-2 px-3">
                         Category: {{ category.name }}
+                        <button type="button"
+                            class="remove-filter"
+                            data-name="category"
+                            data-value="{{ category.id }}"
+                            aria-label="Remove">
+                            X
+                    </button>
                     </span>
                 {% endif %}
             {% endfor %}
@@ -188,43 +232,100 @@
             {% for item in brands_selected %}
                 <span class="badge rounded-pill bg-primary fs-6 py-2 px-3">
                     Brand: {{ item }}
+                    <button type="button"
+                            class="remove-filter"
+                            data-name="brand"
+                            data-value="{{ item }}"
+                            aria-label="Remove">
+                            X
+                    </button>
                 </span>
             {% endfor %}
 
             {% for item in sockets_selected %}
                 <span class="badge rounded-pill bg-primary fs-6 py-2 px-3">
                     Socket: {{ item }}
+                    <button type="button"
+                            class="remove-filter"
+                            data-name="socket"
+                            data-value="{{ item }}"
+                            aria-label="Remove">
+                            X
+                    </button>
                 </span>
             {% endfor %}
 
             {% for item in ram_types_selected %}
                 <span class="badge rounded-pill bg-primary fs-6 py-2 px-3">
                     RAM: {{ item }}
+                    <button type="button"
+                            class="remove-filter"
+                            data-name="ram_type"
+                            data-value="{{ item }}"
+                            aria-label="Remove">
+                            X
+                    </button>
                 </span>
             {% endfor %}
 
             {% for item in storage_types_selected %}
                 <span class="badge rounded-pill bg-primary fs-6 py-2 px-3">
                     Storage: {{ item }}
+                    <button type="button"
+                            class="remove-filter"
+                            data-name="storage_type"
+                            data-value="{{ item }}"
+                            aria-label="Remove">
+                            X
+                    </button>
                 </span>
             {% endfor %}
 
             {% if min_price %}
                 <span class="badge rounded-pill bg-primary fs-6 py-2 px-3">
                     Min: {{ min_price }} €
+                    <button type="button"
+                            class="remove-filter"
+                            data-name="min"
+                            data-value="{{ item }}"
+                            aria-label="Remove">
+                            X
+                    </button>
                 </span>
             {% endif %}
 
             {% if max_price %}
                 <span class="badge rounded-pill bg-primary fs-6 py-2 px-3">
                     Max: {{ max_price }} €
+                    <button type="button"
+                            class="remove-filter"
+                            data-name="max"
+                            data-value="{{ item }}"
+                            aria-label="Remove">
+                            X
+                    </button>
                 </span>
             {% endif %}
 
-            <a href="{% url 'shop:product_list' %}"
-               class="btn btn-sm btn-outline-danger ms-2">
-                Clear all
-            </a>
+            {% for item in stock_status_selected %}
+                <span class="badge rounded-pill bg-primary fs-6 py-2 px-3">
+                    Stock: 
+                    {% if item == "in_stock" %}
+                        In stock
+                    {% elif item == "low_stock" %}
+                        Low stock
+                    {% elif item == "out_of_stock" %}
+                        Out of stock
+                    {% endif %}
+                    <button type="button"
+                            class="remove-filter"
+                            data-name="stock_status"
+                            data-value="{{ item }}"
+                            aria-label="Remove">
+                            X
+                    </button>
+                </span>
+            {% endfor %}
 
         </div>
 

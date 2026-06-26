@@ -147,6 +147,30 @@ document.addEventListener("DOMContentLoaded", function() {
             });
     }
 
+    document.addEventListener("click", function(e) {
+        const btn = e.target.closest(".remove-filter");
+        if (!btn) return;
+
+        const form = document.querySelector(".product-filter-form");
+        if (!form) return;
+
+        const name = btn.dataset.name;
+        const value = btn.dataset.value;
+
+        if (name === 'q' || name === "min" || name === "max") {
+            const input = form.querySelector(`[name="${name}"]`);
+            if (input) input.value = "";
+        }
+        else {
+            form.querySelectorAll(`[name="${name}"]`).forEach(input => {
+                if (input.value === value) {
+                    input.checked = false;
+                }
+            });
+        }
+        form.submit();
+    });
+
     document.addEventListener("submit", function(e) {
 
         const form = e.target 
@@ -193,8 +217,8 @@ document.addEventListener("DOMContentLoaded", function() {
         .then(data => {
             notify(data.type, data.message);
 
-            if(data.new_compatibility_warnings && data.new_compatibility_warnings.length > 0) {
-                notify("warning", "Compatibility warning:\n• " + data.new_compatibility_warnings.join("\n• "));
+            if(data.product_related_warnings && data.product_related_warnings.length > 0) {
+                notify("warning", "Compatibility warning:\n• " + data.product_related_warnings.join("\n• "));
             }
 
             if (data.ok) {
@@ -327,6 +351,12 @@ document.addEventListener("DOMContentLoaded", function() {
     }
 
     function updateCompatibilityStatus(data) {
+
+        if (data.cart_count !== undefined && Number(data.cart_count) === 0) {
+            const card = document.getElementById("compatibility-status");
+            if (card) card.remove();
+            return;
+        }
         if(!("compatibility_warnings" in data)) return;
 
         const card = document.getElementById("compatibility-status");
@@ -335,7 +365,7 @@ document.addEventListener("DOMContentLoaded", function() {
         const warnings = data.compatibility_warnings;
 
         if(warnings.length === 0) {
-            card.className = "card mb-4 shadow-sm border-success";
+            card.className = "card mb-3 shadow-sm border-success";
             card.innerHTML = `<div class="card-header bg-success text-white">
                                   <strong>✓ Compatibility status</strong>
                               </div>
@@ -359,7 +389,7 @@ document.addEventListener("DOMContentLoaded", function() {
                        </p>
                        <ul class="mb-0">
                   `;
-        warnnings.forEach(warning => {
+        warnings.forEach(function(warning) {
             html += `<li>${warning}</li>`;
         });
 
@@ -368,7 +398,7 @@ document.addEventListener("DOMContentLoaded", function() {
             </div>
         `;
 
-        card.className = "card mb-4 shadow-sm border-danger";
+        card.className = "card mb-3 shadow-sm border-danger";
         card.innerHTML = html;
                        
     }
@@ -488,7 +518,8 @@ document.addEventListener("DOMContentLoaded", function() {
             notify("warning", `Only ${max} units of ${productName} are available.`)
         }
     });
-
+    
+     
 
     UpdateMiniCart();
 })

@@ -169,48 +169,48 @@
     
     </div>
 
-    <div class="col-lg-4">
+    {% if cart|length > 0 %}
 
-        <div class="sticky-top cart-sidebar">
+        <div class="col-lg-4">
 
-            <div id="compatibility-status" class="card mb-4 shadow-sm 
-                {% if compatibility_warnings %}border-danger{% else %}border-success{% endif %}">
+            <div class="sticky-top cart-sidebar">
 
-                <div class="card-header
-                {% if compatibility_warnings %}bg-danger text-white{% else %}bg-success text-white{% endif %}">
+                <div id="compatibility-status" class="card mb-2 shadow-sm 
+                    {% if compatibility_warnings %}border-danger{% else %}border-success{% endif %}">
 
-                    <strong>
+                    <div class="card-header
+                    {% if compatibility_warnings %}bg-danger text-white{% else %}bg-success text-white{% endif %}">
+
+                        <strong>
+                            {% if compatibility_warnings %}
+                                ⚠ Compatibility status
+                            {% else %}
+                                ✓ Compatibility status
+                            {% endif %}
+                        </strong>
+                    </div>
+                    
+                    <div class="card-body">
                         {% if compatibility_warnings %}
-                            ⚠ Compatibility status
+
+                            <p class="mb-2">
+                                {{ compatibility_warnings|length }} compatibility issue{% if compatibility_warnings|length != 1 %}s{% endif %} detected.
+                            </p>
+
+                            <ul class="mb-0">
+                                {% for warning in compatibility_warnings %}
+                                    <li>{{ warning|safe }}</li>
+                                {% endfor %}
+                            </ul>
                         {% else %}
-                            ✓ Compatibility status
+                            <p class="mb-0 text-success">
+                                All components in your cart are compatible.
+                            </p>
                         {% endif %}
-                    </strong>
+                    </div>
                 </div>
-                
-                <div class="card-body">
-                    {% if compatibility_warnings %}
 
-                        <p class="mb-2">
-                            {{ compatibility_warnings|length }} compatibility issue{% if compatibility_warnings|length != 1 %}s{% endif %} detected.
-                        </p>
-
-                        <ul class="mb-0">
-                            {% for warning in compatibility_warnings %}
-                                <li>{{ warning }}</li>
-                            {% endfor %}
-                        </ul>
-                    {% else %}
-                        <p class="mb-0 text-success">
-                            All components in your cart are compatible.
-                        </p>
-                    {% endif %}
-                </div>
-            </div>
-        
-            {% if cart|length > 0 %}
-
-                <div id="order-summary" class="card shadow-sm p-3" style="top: 90px;">
+                <div id="order-summary" class="card shadow-sm p-3">
 
                     <h4>Order Summary</h4>
                     <hr>
@@ -263,11 +263,13 @@
 
                 </div>
 
-            {% endif %}
-            
+                
+                
+            </div>
+
         </div>
 
-    </div>
+    {% endif %}
 
 </div>
 

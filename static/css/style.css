@@ -8,13 +8,41 @@
     top: 90px;
     z-index: 10;
     max-height: calc(100vh - 100px);
-    overflow-y: auto;
+    overflow-y: auto
+}
+
+.remove-filter {
+    border: none;
+    background: transparent;
+    color: white;
+    font-size: 0.9rem;
+    font-weight: bold;
+    margin-left: 6px;
+    padding: 0;
+    line-height: 1;
+    cursor: pointer;
+}
+
+.remove-filter:hover {
+    opacity: 0.8;
 }
 
 .toast-body {
     white-space: pre-line;
 }
 
+
+.navbar .nav-link.active {
+    color: #fff !important;
+    font-weight: 700;
+    border-bottom: 2px solid #fff;
+}
+
+.active-nav-btn {
+    background-color: #fff;
+    color: #212529 !important;
+    font-weight: 700;
+}
 
 .navbar.fixed-top {
     position: fixed !important;
