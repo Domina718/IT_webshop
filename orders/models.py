@@ -7,7 +7,7 @@ class Order(models.Model):
     token = models.UUIDField(
         default = uuid.uuid4,
         editable=False,
-        unique=True
+        unique =True
     )
     user = models.ForeignKey(
         User, 
@@ -31,7 +31,19 @@ class Order(models.Model):
     created = models.DateTimeField(auto_now_add=True)
     updated = models.DateTimeField(auto_now=True)
 
-    paid = models.BooleanField(default=False)
+    STATUS_CHOICES = [
+        ('ordered', 'Ordered'),
+        ('paid', 'Paid'),
+        ('shipped', 'Shipped'),
+        ('delivered', 'Delivered'),
+        ('cancelled', 'Cancelled'),
+    ]
+
+    status = models.CharField(
+        max_length = 20,
+        choices = STATUS_CHOICES,
+        default = 'ordered'
+    )
 
     class Meta:
         ordering = ['-created']

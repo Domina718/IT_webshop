@@ -22,10 +22,16 @@
 
             <p><b>Date:</b> {{ order.created }}</p>
 
-            {% if order.paid %}
+            {% if order.status == 'ordered' %}
+                <span class="badge bg-secondary">Ordered</span>
+            {% elif order.status == 'paid' %}
                 <span class="badge bg-success">Paid</span>
-            {% else %}
-                <span class="badge bg-warning text-dark">Pending</span>
+            {% elif order.status == 'shipped' %}
+                <span class="badge bg-info text-dark">Shipped</span>
+            {% elif order.status == 'delivered' %}
+                <span class="badge bg-primary">Delivered</span>
+            {% elif order.status == 'cancelled' %}
+                <span class="badge bg-danger">Cancelled</span>
             {% endif %}
 
             <hr>

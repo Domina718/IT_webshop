@@ -140,6 +140,7 @@ def product_detail(request, pk):
         
         can_review = OrderItem.objects.filter(
             order__user = request.user,
+            order__status = 'delivered',
             product = product
         ).exists()
 
@@ -261,10 +262,10 @@ def product_detail(request, pk):
     if request.user.is_authenticated:
         can_review = OrderItem.objects.filter(
             order__user = request.user,
+            order__status = 'delivered',
             product = product
         ).exists()
 
-    if request.user.is_authenticated:
         user_review = Review.objects.filter(
             product = product,
             user = request.user

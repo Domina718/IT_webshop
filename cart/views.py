@@ -287,24 +287,6 @@ def check_compatibility(cart_items):
                         f"<strong>{case.name}</strong> (max {case.max_gpu_length} mm)." 
                     )
 
-    #motherboards_with_form_factor = [
-    #    product for product in products 
-    #    if product.form_factor and product.category.name.lower() in ["motherboard", "motherboards"]
-    #]
-
-    #cases_with_form_factor = [
-    #    product for product in products 
-    #    if product.form_factor and product.category.name.lower() in ["case", "cases"]
-    #]
-
-    #for motherboard in motherboards_with_form_factor:
-    #    for case in cases_with_form_factor:
-    #        if motherboard.form_factor != case.form_factor:
-    #            warnings.append(
-    #                f"{motherboard.name} ({motherboard.form_factor}) may not fit in "
-    #                f"{case.name} ({case.form_factor})." 
-    #            )
-
     return warnings
 
 

@@ -13,9 +13,9 @@ class OrderAdmin(admin.ModelAdmin):
         'user',
         'first_name',
         'last_name',
-        'paid',
+        'status',
         'created'
     ]
 
-    list_filter = ['paid', 'created']
+    list_filter = ['status', 'created']
     inlines = [OrderItemInline]
