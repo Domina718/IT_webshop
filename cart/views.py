@@ -184,7 +184,7 @@ def update_cart(request, product_id):
             item.save()
 
         user_cart.save()
-        
+
     else:
         
         cart = Cart(request)
@@ -294,7 +294,7 @@ def check_compatibility(cart_items):
                 if psu.psu_wattage < gpu.power_required:
                     warnings.append(
                         f"<strong>{gpu.name}</strong> requires at least {gpu.power_required}W, "
-                        f"but <strong>{psu.name}</strong> ({psu.psu_wattage})W." 
+                        f"but <strong>{psu.name}</strong> provides ({psu.psu_wattage})W." 
                     )
     
     cases = [
