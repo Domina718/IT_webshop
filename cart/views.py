@@ -48,6 +48,8 @@ def add_to_cart(request, product_id):
         cart_item.quantity = new_quantity
         cart_item.save()
 
+        user_cart.save()
+
         cart = DatabaseCart(request.user)
 
     else:
@@ -119,6 +121,7 @@ def remove_from_cart(request, product_id):
         if item:
             removed_qty = item.quantity
             item.delete()
+            user_cart.save()
         else:
             removed_qty = 0
 
@@ -179,6 +182,9 @@ def update_cart(request, product_id):
         else: 
             item.quantity = quantity
             item.save()
+
+        user_cart.save()
+        
     else:
         
         cart = Cart(request)
@@ -252,6 +258,24 @@ def check_compatibility(cart_items):
                 warnings.append(
                     f"<strong>{ram.name}</strong> ({ram.ram_type}) is not compatible with "
                     f"<strong>{motherboard.name}</strong> ({motherboard.ram_type})." 
+                )
+
+    nvme_ssds = [
+        product for product in products 
+        if product.storage_type and product.storage_type.lower() == "nvme" and product.category.name.lower() == "ssd"
+    ]
+
+    motherboards_for_nvme = [
+        product for product in products 
+        if product.category.name.lower() in ["motherboard", "motherboards"]
+    ]
+
+    for ssd in nvme_ssds:
+        for motherboard in motherboards_for_nvme:
+            if not motherboard.nvme_support:
+                warnings.append(
+                    f"<strong>{ssd.name}</strong> requires NVMe support, "
+                    f"but <strong>{motherboard.name}</strong> does not support NVMe SSDs." 
                 )
 
     gpus = [

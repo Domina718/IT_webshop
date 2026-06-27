@@ -1,0 +1,25 @@
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+MIME-Version: 1.0
+Subject: Password reset
+From: webmaster@localhost
+To: user3@gmail.com
+Date: Sat, 27 Jun 2026 22:28:08 +0000
+Message-ID: <178259928837.25412.17090299813467540644@DESKTOP-NKFV7TO>
+
+Someone requested a password reset for your account.
+
+
+Open this link to choose a new password:
+
+
+http://localhost:8000/accounts/reset/Ng/dauxaw-2971564ea7f284922412f01f17afe1=
+9a/
+
+
+Username: user3
+
+
+If you did not request this, ignore this email.
+
+-------------------------------------------------------------------------------

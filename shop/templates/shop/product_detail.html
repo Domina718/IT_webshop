@@ -108,16 +108,16 @@
                         <p><b>Power Required:</b> {{ product.power_required }}W</p>
                     {% endif %}
 
-                    {% if product.category.name == "GPU" and product.power_required %}
-                        <div class="alert alert-warning mt-3">
-                            <b>Power recommendation:</b>
-                            <br>
-                            This GPU requires at least {{ product.power_required }}W PSU.
-                        </div>
+                    {% if product.gpu_length %}
+                        <p><b>GPU length:</b> {{ product.gpu_length }} mm</p>
                     {% endif %}
 
-                    {% if product.gpu_length %}
-                        <p><b>GPU length:</b> {{ product.gpu_length }}mm</p>
+                    {% if product.max_gpu_length %}
+                        <p><b>Max GPU length:</b> {{ product.max_gpu_length }} mm</p>
+                    {% endif %}
+
+                    {% if product.psu_wattage %}
+                        <p><b>PSU wattage:</b> {{ product.psu_wattage }}W</p>
                     {% endif %}
 
                     {% if product.form_factor %}
@@ -149,11 +149,51 @@
                     {% endif %}
 
                     {% if product.vram %}
-                        <p><b>VRAM:</b> {{ product.vram }} GB</p>
+                        <p><b>VRAM:</b> {{ product.vram_gb }} GB</p>
                     {% endif %}
 
                     {% if product.efficiency_rating %}
                         <p><b>Efficiency:</b> {{ product.efficiency_rating }}</p>
+                    {% endif %}
+
+                    {% if product.category.name == "GPU" and product.power_required %}
+                        <div class="alert alert-warning mt-3">
+                            <b>Recommended PSU:</b>
+                            <br>
+                            Use a power supply of <b>{{ product.power_required }}W</b> or higher.
+                        </div>
+                    {% endif %}
+
+                    {% if product.category.name == "Case" and product.max_gpu_length %}
+                        <div class="alert alert-info mt-3">
+                            <b>Maximum GPU length:</b>
+                            <br>
+                            Supports graphics cards up to <b>{{ product.max_gpu_length }} mm</b>.
+                        </div>
+                    {% endif %}
+
+                    {% if product.category.name == "PSU" and product.psu_wattage %}
+                        <div class="alert alert-success mt-3">
+                            <b>Power output:</b>
+                            <br>
+                            Delivers up to <b>{{ product.psu_wattage }}W</b>.
+                        </div>
+                    {% endif %}
+
+                    {% if product.category.name == "SSD" and product.storage_type == "NVMe" %}
+                        <div class="alert alert-info mt-3">
+                            <b>Compatibility:</b>
+                            <br>
+                            Requires a motherboard with NVMe support.
+                        </div>
+                    {% endif %}
+
+                    {% if product.category.name == "Motherboard" and product.nvme_support %}
+                        <div class="alert alert-info mt-3">
+                            <b>Storage support:</b>
+                            <br>
+                            Supports NVMe M.2 SSDs.
+                        </div>
                     {% endif %}
 
                     {% if product.stock > 0 %}
