@@ -8,6 +8,7 @@ from .forms import RegisterForm, ProfileForm, CustomPasswordChangeForm
 from .models import Profile
 from cart.cart import Cart
 from cart.models import UserCart, UserCartItem
+from shop.models import Review
 
 
 
@@ -174,6 +175,18 @@ def change_password(request):
             'form': form
         }
     )
+
+@login_required
+def my_reviews(request):
+
+    reviews = Review.objects.filter(
+        user = request.user
+    ).select_related(
+        'product'
+    ).order_by('-updated')
+
+    return render(request, 'users/my_reviews.html', {'reviews': reviews})
+
 
 
 def custom_logout(request):

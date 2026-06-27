@@ -1,0 +1,99 @@
+{% extends 'base.html' %}
+
+{% block content %}
+
+<div class="container">
+
+    <h2 class="mb-4">My Reviews</h2>
+
+    {% for review in reviews %}
+
+        <div class="card mb-3 shadow-sm">
+
+            <div class="row g-0">
+
+                <div class="col-md-3">
+                    {% if review.product.image %}
+                        <img src="{{ review.product.image.url }}"
+                             class="img-fluid rounded-start cart-item-image">
+                    {% else %}
+                        <div class="bg-light d-flex align-items-center justify-content-center h-100">
+                            <span class="text-muted">No image</span>
+                        </div>
+                    {% endif %}
+                </div>
+
+                <div class="col-md-9">
+
+                    <div class="card-body">
+
+                        <div class="d-flex justify-content-between align-items-start">
+
+                            <div>
+                                <h5 class="card-title mb-1">
+                                    <a href="{% url 'shop:product_detail' review.product.pk %}"
+                                       class="text-decoration-none">
+                                        {{ review.product.name }}
+                                    </a>
+                                </h5>
+
+                                <p class="text-muted mb-2">
+                                    Reviewed on {{ review.created|date:"d.m.Y H:i" }}
+                                    {% if review.updated != review.created %}
+                                        Updated {{ review.updated|date:"d.m.Y H:i" }}
+                                    {% endif %}
+                                </p>
+                            </div>
+
+                            <div class="mb-2">
+                                {% include 'shop/components/rating_stars.html' with rating=review.rating %}
+                                <small class="text-muted">{{ review.rating }}/5</small>
+                            </div>
+                        </div>
+
+                        {% if review.comment %}
+                            <p class="mb-3">
+                                {{ review.comment }}
+                            </p>
+                        {% else %}
+                            <p class="text-muted mb-3">
+                                No comment written.
+                            </p>
+                        {% endif %}
+
+                        <div class="d-flex gap-2">
+
+                            <a href="{% url 'shop:product_detail' review.product.pk %}"
+                               class="btn btn-outline-primary btn-sm">
+                                View product
+                            </a>
+
+                            <a href="{% url 'shop:product_detail' review.product.pk %}#review-display"
+                               class="btn btn-primary btn-sm">
+                                Edit review
+                            </a>
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    {% empty %}
+        
+        <div class="text-center mt-5">
+            <h4>No reviews yet</h4>
+            <p class="text-muted">
+                Reviews you write will appear here.
+            </p>
+        </div>
+
+    {% endfor %}
+
+</div>
+
+{% endblock %}
