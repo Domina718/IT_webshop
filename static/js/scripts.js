@@ -31,14 +31,6 @@ document.addEventListener("DOMContentLoaded", function() {
         showToast(message);
     }
 
-    function updateCartBadge(delta = 1) {
-        const el = document.getElementById("cart-count");
-        if (!el) return;
-
-        let current = parseInt(el.innerText || "0");
-        el.innerText = current + delta;
-    }
-
     function showEmptyCartIfNeeded(cartCount) {
         cartCount = parseInt(cartCount);
 
@@ -411,7 +403,7 @@ document.addEventListener("DOMContentLoaded", function() {
 
     function updateCompatibilityStatus(data) {
 
-        if (data.cart_count !== undefined && Number(data.cart_count) === 0) {
+        if (data.cart_count !== undefined && Number(data.cart_count) < 2) {
             const card = document.getElementById("compatibility-status");
             if (card) card.remove();
             return;

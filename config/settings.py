@@ -136,7 +136,7 @@ MEDIA_URL = '/media/'
 MEDIA_ROOT = BASE_DIR / 'media'
 
 
-LOGUN_REDIRECT_URL = 'shop:product_list'
+LOGIN_REDIRECT_URL = 'shop:product_list'
 LOGOUT_REDIRECT_URL = 'shop:product_list'
 
 MESSAGE_TAGS = {

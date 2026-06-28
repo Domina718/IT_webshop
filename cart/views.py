@@ -99,7 +99,7 @@ def add_to_cart(request, product_id):
                 })
 
 
-
+@require_POST
 def remove_from_cart(request, product_id):
 
     product = Product.objects.filter(id=product_id).first()
@@ -294,7 +294,7 @@ def check_compatibility(cart_items):
                 if psu.psu_wattage < gpu.power_required:
                     warnings.append(
                         f"<strong>{gpu.name}</strong> requires at least {gpu.power_required}W, "
-                        f"but <strong>{psu.name}</strong> provides ({psu.psu_wattage})W." 
+                        f"but <strong>{psu.name}</strong> provides {psu.psu_wattage}W." 
                     )
     
     cases = [

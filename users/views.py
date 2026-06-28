@@ -70,7 +70,11 @@ def profile(request):
         )
 
         if form.is_valid():
-            form.save()
+            profile = form.save()
+
+            request.user.first_name = profile.first_name
+            request.user.last_name = profile.last_name
+            request.user.save(update_fields=['first_name', 'last_name'])
 
             messages.success(
                 request,
@@ -114,7 +118,11 @@ def edit_profile(request):
 
         if form.is_valid():
 
-            form.save()
+            profile = form.save()
+
+            request.user.first_name = profile.first_name
+            request.user.last_name = profile.last_name
+            request.user.save(update_fields=['first_name', 'last_name'])
 
             messages.success(
                 request,
@@ -279,7 +287,7 @@ def toggle_wishlist(request, product_id):
             product = product
         )
         in_wishlist = True
-        message = f" {product.name} added to wishlist."
+        message = f"{product.name} added to wishlist."
 
     return JsonResponse({
         "ok": True,

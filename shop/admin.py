@@ -62,8 +62,10 @@ class ReviewAdmin(admin.ModelAdmin):
     )
 
     list_filter = (
+        'user',
+        'product',
         'rating',
-        'created'
+        'created',
     )
 
     search_fields = (

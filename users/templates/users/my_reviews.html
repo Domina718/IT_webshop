@@ -38,9 +38,9 @@
                                 </h5>
 
                                 <p class="text-muted mb-2">
-                                    Reviewed on {{ review.created|date:"d.m.Y H:i" }}
-                                    {% if review.updated != review.created %}
-                                        Updated {{ review.updated|date:"d.m.Y H:i" }}
+                                    First reviewed on {{ review.created|date:"d.m.Y H:i" }}
+                                    {% if review.updated != review.created %}<br>
+                                        Last updated {{ review.updated|date:"d.m.Y H:i" }}
                                     {% endif %}
                                 </p>
                             </div>
