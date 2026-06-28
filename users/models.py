@@ -67,5 +67,5 @@ class WishlistItem(models.Model):
         unique_together = ('user', 'product')
         ordering = ['-created_at']
 
-    def __stra__(self):
+    def __str__(self):
         return f"{self.user.username} - {self.product.name}"
