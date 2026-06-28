@@ -110,12 +110,6 @@ def product_list(request):
         if product.avg_rating:
             product.rating_percent = float(product.avg_rating / 5 * 100)
 
-    is_in_wishlist = False
-
-    if request.user.is_authenticated:
-        is_in_wishlist = request.user.wishlist_items.filter(
-            product = product
-        ).exists()
 
     return render(request, 'shop/product_list.html',{
         'products': products,
@@ -135,7 +129,6 @@ def product_list(request):
         'stock_status_options': stock_status_options,
         'stock_status_selected': stock_status_selected,
         'wishlist_product_ids': wishlist_product_ids,
-        'is_in_wishlist': is_in_wishlist,
     })
 
 
@@ -274,6 +267,7 @@ def product_detail(request, pk):
     user_review = None
     form = None
     can_review = False
+    is_in_wishlist = False        
 
     if request.user.is_authenticated:
         can_review = OrderItem.objects.filter(
@@ -286,6 +280,10 @@ def product_detail(request, pk):
             product = product,
             user = request.user
         ).first()
+
+        is_in_wishlist = request.user.wishlist_items.filter(
+            product = product
+        ).exists()
 
         if user_review:
             form = ReviewForm(instance = user_review)
@@ -301,6 +299,7 @@ def product_detail(request, pk):
         'compatibility_groups': compatibility_groups,
         'recommended_products': recommended_products,
         'can_review': can_review,
+        'is_in_wishlist': is_in_wishlist,
     })
 
 def home(request):
