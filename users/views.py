@@ -1,14 +1,16 @@
-from django.shortcuts import render,redirect
+from django.shortcuts import render,redirect, get_object_or_404
 from django.contrib import messages
 from django.contrib.auth import login, logout, update_session_auth_hash
 from django.contrib.auth.views import LoginView
 from django.contrib.auth.decorators import login_required
+from django.views.decorators.http import require_POST
+from django.http import JsonResponse
 from orders.models import Order
 from .forms import RegisterForm, ProfileForm, CustomPasswordChangeForm
-from .models import Profile
+from .models import Profile, WishlistItem
 from cart.cart import Cart
 from cart.models import UserCart, UserCartItem
-from shop.models import Review
+from shop.models import Product, Review
 
 
 
@@ -245,5 +247,44 @@ class CustomLoginView(LoginView):
             self.request.session.modified = True
 
         return response
+    
+@login_required
+def my_wishlist(request):
 
+    wishlist_items = WishlistItem.objects.filter(
+        user = request.user
+    ).select_related('product')
+
+    return render(request, 'users/my_wishlist.html', {'wishlist_items': wishlist_items})
+
+
+@login_required
+@require_POST
+def toggle_wishlist(request, product_id):
+
+    product = get_object_or_404(Product, id=product_id)
+
+    wishlist_item = WishlistItem.objects.filter(
+        user = request.user,
+        product = product
+    ).first()
+
+    if wishlist_item:
+        wishlist_item.delete()
+        in_wishlist = False
+        message = f"{product.name} removed from wishlist."
+    else:
+        WishlistItem.objects.create(
+            user = request.user,
+            product = product
+        )
+        in_wishlist = True
+        message = f" {product.name} added to wishlist."
+
+    return JsonResponse({
+        "ok": True,
+        "in_wishlist": in_wishlist,
+        "product_id": product_id,
+        "message": message
+    })
                                             

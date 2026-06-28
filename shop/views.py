@@ -99,9 +99,23 @@ def product_list(request):
         review_count = Count('reviews')
     )
 
+    wishlist_product_ids = []
+
+    if request.user.is_authenticated:
+        wishlist_product_ids = list(
+            request.user.wishlist_items.values_list('product_id', flat=True)
+        )
+
     for product in products:
         if product.avg_rating:
             product.rating_percent = float(product.avg_rating / 5 * 100)
+
+    is_in_wishlist = False
+
+    if request.user.is_authenticated:
+        is_in_wishlist = request.user.wishlist_items.filter(
+            product = product
+        ).exists()
 
     return render(request, 'shop/product_list.html',{
         'products': products,
@@ -120,6 +134,8 @@ def product_list(request):
         'storage_types_selected': storage_types_selected,
         'stock_status_options': stock_status_options,
         'stock_status_selected': stock_status_selected,
+        'wishlist_product_ids': wishlist_product_ids,
+        'is_in_wishlist': is_in_wishlist,
     })
 
 
@@ -289,6 +305,27 @@ def product_detail(request, pk):
 
 def home(request):
 
-    products = Product.objects.all()[:8]
+    discount_products = list(
+        Product.objects.filter(discount_percent__gt=0).order_by('-id')
+    )
 
-    return render(request, 'shop/home.html', {'products': products})
+    if len(discount_products) < 4:
+        ids = [p.id for p in discount_products]
+
+        extra = Product.objects.exclude(id__in=ids).order_by('-id')[:4-len(discount_products)]
+
+        featured_products = discount_products + list(extra)
+    else:
+        featured_products = discount_products[:4]
+
+    latest_products = Product.objects.order_by('-id')[:8]
+
+
+
+    return render(request, 
+                  'shop/home.html', 
+                  {
+                      'featured_products': featured_products,
+                      'latest_products': latest_products,
+                  },
+    )

@@ -101,6 +101,13 @@
                                             </a>
                                         </li>
 
+                                        <li>
+                                            <a class="dropdown-item"
+                                               href="{% url 'users:my_wishlist' %}">
+                                                My Wishlist
+                                            </a>
+                                        </li>
+
                                         <li><hr class="dropdown-divider"></li>
 
                                         <li>
@@ -180,6 +187,11 @@
                     <a class="nav-link text-white mb-3"
                        href="{% url 'users:my_reviews' %}">
                         My Reviews
+                    </a>
+
+                    <a class="nav-link text-white mb-3"
+                       href="{% url 'users:my_wishlist' %}">
+                        My Wishlist
                     </a>
 
                     <form method="post" action="{% url 'logout' %}">

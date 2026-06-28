@@ -148,6 +148,65 @@ document.addEventListener("DOMContentLoaded", function() {
     }
 
     document.addEventListener("click", function(e) {
+        const btn = e.target.closest(".wishlist-btn");
+        if(!btn) return;
+
+        e.preventDefault();
+
+        const form = btn.closest(".wishlist-form");
+        if(!form) return;
+
+        fetch(form.action, {
+            method: "POST",
+            headers: {
+                "X-CSRFToken": getCSRFToken()
+            }
+        })
+        .then(res => res.json())
+        .then(data => {
+            if(!data.ok) return;
+
+            const showLabel = btn.dataset.listLabel;
+
+            if (showLabel === "true") {
+                btn.innerText = data.in_wishlist
+                    ? "♥ Remove from wishlist"
+                    : "♡ Add to wishlist";
+            }
+            else if (showLabel === "false") {
+                btn.innerText = data.in_wishlist ? "♥" : "♡";
+            }
+            else if (showLabel === "remove") {
+                const itemEl = document.querySelector(
+                    `[data-wishlist-item="${data.product_id}"]`
+                );
+            
+                if (itemEl) {
+                    itemEl.remove();
+                }
+
+                const wishlistItems = document.querySelectorAll("[data-wishlist-item]");
+
+                if (wishlistItems.length === 0) {
+                    const container = document.getElementById("wishlist-items");
+
+                    if (container) {
+                        container.innerHTML = `
+                            <div id="empty-wishlist-message" class="text-center mt-5">
+                                <h4>Your wishlist is empty</h4>
+                                <p class="text-muted"> 
+                                    Products you save will appear here.
+                                </p>
+                            </div>
+                        `;
+                    }
+                }
+            }
+            notify("success", data.message);
+        });
+    });
+
+    document.addEventListener("click", function(e) {
         const btn = e.target.closest(".remove-filter");
         if (!btn) return;
 

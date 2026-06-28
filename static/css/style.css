@@ -11,6 +11,18 @@
     overflow-y: auto
 }
 
+#homeCarousel .carousel-control-prev,
+#homeCarousel .carousel-control-next {
+    width: 8%;
+}
+
+#homeCarousel .carousel-control-prev-icon,
+#homeCarousel .carousel-control-next-icon {
+    background-color: rgba(0, 0, 0, 0.7);
+    border-radius: 50%;
+    padding: 20px;
+}
+
 .remove-filter {
     border: none;
     background: transparent;
